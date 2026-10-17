@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, ImageIcon, ArrowDown, ArrowUp } from "lucide-react";
+import { Heart, ImageIcon, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { buildJourneyItems, journeyPosition, type JourneyItem } from "@/lib/journey";
+import { buildJourneyItems, journeyPosition, journeyCylinderPose, type JourneyItem } from "@/lib/journey";
 
 export function ScrollJourney() {
   const [memories, setMemories] = useState<JourneyItem[]>([]);
@@ -97,16 +97,15 @@ export function ScrollJourney() {
         <div className="journey-stage sticky top-0 flex h-screen items-center justify-center overflow-hidden">
           {items.map((memory, index) => {
             const distance = index - position;
-            const visible = distance >= -0.8 && distance <= 12;
-            const opacity = distance < 0 ? Math.max(0, 1 + distance / 0.8) : Math.max(0, 1 - distance / 13);
-            const angle = distance * 1.35;
-            const radius = Math.min(Math.abs(distance), 2) * 0.5;
+            const visible = Math.abs(distance) <= 4;
+            const { angle, x, depth } = journeyCylinderPose(distance);
+            const opacity = 0.35 + 0.65 * (1 + depth / 2);
             return (
               <Button key={memory.id} variant="ghost" tabIndex={index === activeIndex ? 0 : -1}
                 aria-label={memory.empty ? `Anı ${memory.slot} — aç` : `${memory.title} — aç`}
                 onClick={() => setSelected(memory)}
                 className="journey-card absolute block h-auto overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
-                style={{ transform: `translate3d(calc(${Math.cos(angle) * radius} * var(--journey-spiral-x)), calc(${Math.sin(angle) * radius} * var(--journey-spiral-y)), ${-distance * 520}px) rotateY(${Math.sin(angle) * Math.min(Math.abs(distance), 1) * -14}deg) rotateZ(${Math.sin(angle) * Math.min(Math.abs(distance), 1) * 5}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: items.length - index, pointerEvents: index === activeIndex ? "auto" : "none" }}>
+                style={{ transform: `translate3d(calc(${x} * var(--journey-cylinder-radius)), 0, calc(${depth} * var(--journey-cylinder-radius))) rotateY(${angle}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: Math.round(100 - Math.abs(distance) * 10), pointerEvents: index === activeIndex ? "auto" : "none" }}>
                 {memory.url ? <img src={memory.url} alt={memory.title} className="journey-card-photo w-full object-cover" draggable={false} /> : (
                   <div className="journey-card-photo flex min-h-40 items-center justify-center bg-muted/50">
                     <ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" />
@@ -124,9 +123,9 @@ export function ScrollJourney() {
             );
           })}
           <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
-            <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowUp className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
-            <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowDown className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowRight className="h-4 w-4" /></Button>
           </div>
         </div>
       </div>
