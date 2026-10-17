@@ -1,4 +1,5 @@
 - [x] Yolculuğa 100 açılabilir boş kart ekle ve kaydırma erişimini düzelt.
 - [x] Anı fotoğraflarını soluk arka plan önizlemeleri olarak göster.
 - [x] 100 kart ve kaydırma konumu kurallarını testlerle doğrula.
-- [ ] Gerçek hesapla kart açma ve fotoğraflı arka planı doğrula — önizlemede kullanıcının giriş yapması gerekiyor.
+- [x] Video referansına göre kartları derinlikte dağıt; arka planı tek soluk fotoğrafa dönüştür.
+- [x] Gerçek hesapla kart açma, fotoğraflı arka plan ve son karta ulaşmayı doğrula.
