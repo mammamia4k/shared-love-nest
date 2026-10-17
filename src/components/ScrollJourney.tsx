@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart } from "lucide-react";
+import { Heart, X } from "lucide-react";
 
 type Item = {
   id: string;
@@ -15,6 +15,7 @@ const CARD_COUNT_SPACING = 0.55; // scroll progress between cards
 export function ScrollJourney() {
   const [items, setItems] = useState<Item[]>([]);
   const [progress, setProgress] = useState(0);
+  const [selected, setSelected] = useState<Item | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
