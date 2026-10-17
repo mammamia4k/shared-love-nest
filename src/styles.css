@@ -156,20 +156,28 @@
   height: calc(100dvh - 180px);
   min-height: 480px;
   perspective: 1100px;
-  perspective-origin: 45% 48%;
-  --journey-front-x: 160px;
-  --journey-card-step: 540px;
+  perspective-origin: 50% 50%;
+  --journey-spiral-x: 1450px;
+  --journey-spiral-y: 1000px;
 }
-.journey-card { will-change: transform, opacity; box-shadow: var(--shadow-journey); }
+.journey-card {
+  width: min(76vw, 720px);
+  max-height: calc(100dvh - 300px);
+  will-change: transform, opacity;
+  box-shadow: var(--shadow-journey);
+}
+.journey-card-photo { height: min(43dvh, 560px); }
 .journey-background-photo {
-  opacity: 0.55;
-  filter: saturate(0.55) blur(12px);
+  opacity: 0.85;
+  filter: saturate(0.8) blur(5px);
   transform: scale(1.06);
   animation: journey-photo-appear 900ms ease-out both;
 }
-@keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.55; } }
+@keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.85; } }
 @media (max-width: 767px) {
-  .journey-stage { --journey-front-x: 0px; --journey-card-step: 260px; perspective: 950px; }
+  .journey-stage { --journey-spiral-x: 780px; --journey-spiral-y: 720px; perspective: 950px; }
+  .journey-card { width: 88vw; max-height: calc(100dvh - 290px); }
+  .journey-card-photo { height: min(36dvh, 330px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .journey-card { will-change: auto; }

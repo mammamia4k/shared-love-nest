@@ -3,3 +3,5 @@
 - [x] 100 kart ve kaydırma konumu kurallarını testlerle doğrula.
 - [x] Video referansına göre kartları derinlikte dağıt; arka planı tek soluk fotoğrafa dönüştür.
 - [x] Gerçek hesapla kart açma, fotoğraflı arka plan ve son karta ulaşmayı doğrula.
+- [ ] Kartları büyüt, akışı spiral yap ve arka plan fotoğrafını belirginleştir.
+- [ ] Güncel spiral görünümü ve kart açmayı gerçek hesapla doğrula.
