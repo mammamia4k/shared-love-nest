@@ -89,7 +89,7 @@ export function ScrollJourney() {
       {backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-background/70" />
+          <div className="absolute inset-0 bg-background/45" />
         </div>
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
@@ -99,14 +99,16 @@ export function ScrollJourney() {
             const distance = index - position;
             const visible = distance >= -0.8 && distance <= 12;
             const opacity = distance < 0 ? Math.max(0, 1 + distance / 0.8) : Math.max(0, 1 - distance / 13);
+            const angle = distance * 1.35;
+            const radius = Math.min(Math.abs(distance), 2) * 0.5;
             return (
               <Button key={memory.id} variant="ghost" tabIndex={index === activeIndex ? 0 : -1}
                 aria-label={memory.empty ? `Anı ${memory.slot} — aç` : `${memory.title} — aç`}
                 onClick={() => setSelected(memory)}
-                className="journey-card absolute block h-auto w-[78vw] max-w-md overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
-                style={{ transform: `translate3d(calc(var(--journey-front-x) - ${distance} * var(--journey-card-step)), ${Math.sin(distance * 0.45) * 24}px, ${-distance * 620}px) rotateY(${-Math.min(Math.max(distance, 0), 1) * 28}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: items.length - index, pointerEvents: index === activeIndex ? "auto" : "none" }}>
-                {memory.url ? <img src={memory.url} alt={memory.title} className="h-[32vh] max-h-80 w-full object-cover" draggable={false} /> : (
-                  <div className="flex h-[27vh] min-h-40 items-center justify-center bg-muted/50">
+                className="journey-card absolute block h-auto overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
+                style={{ transform: `translate3d(calc(${Math.cos(angle) * radius} * var(--journey-spiral-x)), calc(${Math.sin(angle) * radius} * var(--journey-spiral-y)), ${-distance * 520}px) rotateY(${Math.sin(angle) * Math.min(Math.abs(distance), 1) * -14}deg) rotateZ(${Math.sin(angle) * Math.min(Math.abs(distance), 1) * 5}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: items.length - index, pointerEvents: index === activeIndex ? "auto" : "none" }}>
+                {memory.url ? <img src={memory.url} alt={memory.title} className="journey-card-photo w-full object-cover" draggable={false} /> : (
+                  <div className="journey-card-photo flex min-h-40 items-center justify-center bg-muted/50">
                     <ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" />
                   </div>
                 )}
@@ -121,7 +123,7 @@ export function ScrollJourney() {
               </Button>
             );
           })}
-          <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-4">
+          <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
             <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowUp className="h-4 w-4" /></Button>
             <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
             <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowDown className="h-4 w-4" /></Button>
