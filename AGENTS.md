@@ -11,3 +11,4 @@
 
 - Keep blank journey slots as client-side presentation data separate from saved memories, so empty cards never create fabricated records in the private album.
 - Calculate journey depth in card-index space, so every card remains reachable regardless of album size.
+- Use DOM perspective transforms for the scrollable memory gallery, preserving accessible card controls and readable text without a WebGL canvas.

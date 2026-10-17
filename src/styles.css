@@ -100,6 +100,7 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
   --gradient-romance: radial-gradient(circle at 20% 10%, oklch(0.92 0.06 20) 0%, transparent 50%), radial-gradient(circle at 85% 80%, oklch(0.93 0.05 60) 0%, transparent 55%);
   --shadow-soft: 0 10px 40px -15px oklch(0.58 0.15 15 / 0.35);
+  --shadow-journey: 0 25px 65px -25px oklch(0.28 0.04 20 / 0.28), 4px 0 0 oklch(0.89 0.02 35);
 }
 
 .dark {
@@ -151,17 +152,24 @@
   h1, h2, h3 { font-family: var(--font-serif); }
 }
 
-.journey-stage { perspective: 1200px; }
-.journey-card { will-change: transform, opacity; }
-.journey-photo-mosaic {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  opacity: 0.38;
-  filter: saturate(0.75) blur(2px);
-  transform: scale(1.03);
+.journey-stage {
+  perspective: 1100px;
+  perspective-origin: 45% 48%;
+  --journey-front-x: 160px;
+  --journey-card-step: 540px;
 }
+.journey-card { will-change: transform, opacity; box-shadow: var(--shadow-journey); }
+.journey-background-photo {
+  opacity: 0.55;
+  filter: saturate(0.55) blur(12px);
+  transform: scale(1.06);
+  animation: journey-photo-appear 900ms ease-out both;
+}
+@keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.55; } }
 @media (max-width: 767px) {
-  .journey-photo-mosaic { grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .journey-stage { --journey-front-x: 0px; --journey-card-step: 260px; perspective: 950px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .journey-card { will-change: auto; }
+  .journey-background-photo { animation: none; }
 }

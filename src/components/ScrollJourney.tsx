@@ -16,6 +16,9 @@ export function ScrollJourney() {
   const position = journeyPosition(progress, items.length);
   const activeIndex = Math.round(position);
   const photos = memories.filter((item) => item.url);
+  const backgroundPhoto = items[activeIndex]?.url
+    ? items[activeIndex]
+    : photos[Math.min(activeIndex, photos.length - 1)];
 
   useEffect(() => {
     let disposed = false;
@@ -46,15 +49,25 @@ export function ScrollJourney() {
 
   useEffect(() => {
     let raf = 0;
+    let target = 0;
+    let current = 0;
+    let lastTime = 0;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animate = (time: number) => {
+      const dt = Math.min((time - lastTime) / 1000 || 0.016, 0.05);
+      lastTime = time;
+      current = reducedMotion ? target : current + (target - current) * (1 - Math.exp(-14 * dt));
+      if (Math.abs(target - current) < 0.00001) current = target;
+      setProgress(current);
+      raf = current !== target ? requestAnimationFrame(animate) : 0;
+    };
     const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const el = trackRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const total = rect.height - window.innerHeight;
-        setProgress(total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0);
-      });
+      const el = trackRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      target = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      if (!raf) { lastTime = performance.now(); raf = requestAnimationFrame(animate); }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -73,16 +86,10 @@ export function ScrollJourney() {
 
   return (
     <>
-      {photos.length > 0 && (
+      {backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-          <div className="journey-photo-mosaic grid h-full grid-cols-2 gap-5 p-5 md:grid-cols-3">
-            {Array.from({ length: 6 }, (_, i) => {
-              const photo = photos[(Math.floor(activeIndex / 3) + i) % photos.length];
-              if (!photo) return null;
-              return <img key={`${i}-${photo.id}`} src={photo.url} alt="" className="h-full min-h-0 w-full rounded-lg object-cover" />;
-            })}
-          </div>
-          <div className="absolute inset-0 bg-background/60" />
+          <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-background/70" />
         </div>
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
@@ -90,15 +97,15 @@ export function ScrollJourney() {
         <div className="journey-stage sticky top-0 flex h-screen items-center justify-center overflow-hidden">
           {items.map((memory, index) => {
             const distance = index - position;
-            const visible = distance >= -0.65 && distance <= 3;
-            const opacity = distance < 0 ? Math.max(0, 1 + distance / 0.65) : Math.max(0, 1 - distance / 3.5);
+            const visible = distance >= -0.8 && distance <= 12;
+            const opacity = distance < 0 ? Math.max(0, 1 + distance / 0.8) : Math.max(0, 1 - distance / 13);
             return (
               <Button key={memory.id} variant="ghost" tabIndex={index === activeIndex ? 0 : -1}
                 aria-label={memory.empty ? `Anı ${memory.slot} — aç` : `${memory.title} — aç`}
                 onClick={() => setSelected(memory)}
-                className="journey-card absolute block h-auto w-[82vw] max-w-lg overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground shadow-soft hover:bg-card"
-                style={{ transform: `translate3d(${distance === 0 ? 0 : (index % 2 === 0 ? -1 : 1) * Math.min(Math.abs(distance) * 18, 28)}%, 0, ${-distance * 850}px) rotateY(${Math.min(Math.abs(distance), 1) * (index % 2 === 0 ? -5 : 5)}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: items.length - index, pointerEvents: index === activeIndex ? "auto" : "none" }}>
-                {memory.url ? <img src={memory.url} alt={memory.title} className="max-h-[42vh] w-full object-cover" draggable={false} /> : (
+                className="journey-card absolute block h-auto w-[78vw] max-w-md overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
+                style={{ transform: `translate3d(calc(var(--journey-front-x) - ${distance} * var(--journey-card-step)), ${Math.sin(distance * 0.45) * 24}px, ${-distance * 620}px) rotateY(${-Math.min(Math.max(distance, 0), 1) * 28}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: items.length - index, pointerEvents: index === activeIndex ? "auto" : "none" }}>
+                {memory.url ? <img src={memory.url} alt={memory.title} className="h-[32vh] max-h-80 w-full object-cover" draggable={false} /> : (
                   <div className="flex h-[27vh] min-h-40 items-center justify-center bg-muted/50">
                     <ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" />
                   </div>
@@ -114,7 +121,7 @@ export function ScrollJourney() {
               </Button>
             );
           })}
-          <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-4">
+          <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-4">
             <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowUp className="h-4 w-4" /></Button>
             <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
             <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowDown className="h-4 w-4" /></Button>
