@@ -31,7 +31,10 @@ export function ScrollJourney() {
           : { data: [], error: null };
         if (photoError) throw photoError;
         const urls = new Map((signed ?? []).map((photo) => [photo.path, photo.signedUrl]));
-        if (!disposed) setMemories(rows.map((row) => ({ ...row, url: row.photo_path ? urls.get(row.photo_path) : undefined })));
+        if (!disposed) setMemories(rows.map((row) => {
+          const url = row.photo_path ? urls.get(row.photo_path) : null;
+          return url ? { ...row, url } : { ...row };
+        }));
       } catch {
         if (!disposed) setFailed(true);
       } finally {
@@ -75,6 +78,7 @@ export function ScrollJourney() {
           <div className="journey-photo-mosaic grid h-full grid-cols-2 gap-5 p-5 md:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => {
               const photo = photos[(Math.floor(activeIndex / 3) + i) % photos.length];
+              if (!photo) return null;
               return <img key={`${i}-${photo.id}`} src={photo.url} alt="" className="h-full min-h-0 w-full rounded-lg object-cover" />;
             })}
           </div>
