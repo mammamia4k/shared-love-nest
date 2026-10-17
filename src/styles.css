@@ -153,6 +153,8 @@
 }
 
 .journey-stage {
+  height: calc(100dvh - 180px);
+  min-height: 480px;
   perspective: 1100px;
   perspective-origin: 45% 48%;
   --journey-front-x: 160px;
