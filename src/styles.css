@@ -146,9 +146,22 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    background-image: var(--gradient-romance);
-    background-attachment: fixed;
     min-height: 100vh;
   }
   h1, h2, h3 { font-family: var(--font-serif); }
+}
+
+.journey-stage { perspective: 1200px; }
+.journey-card { will-change: transform, opacity; }
+.journey-photo-mosaic {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  opacity: 0.38;
+  filter: saturate(0.75) blur(2px);
+  transform: scale(1.03);
+}
+@media (max-width: 767px) {
+  .journey-photo-mosaic { grid-template-rows: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-card { will-change: auto; }
 }

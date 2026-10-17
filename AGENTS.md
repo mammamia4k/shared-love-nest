@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep blank journey slots as client-side presentation data separate from saved memories, so empty cards never create fabricated records in the private album.
+- Calculate journey depth in card-index space, so every card remains reachable regardless of album size.
