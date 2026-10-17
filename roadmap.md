@@ -1,0 +1,3 @@
+- [ ] Yolculuğa 100 açılabilir boş kart ekle ve kaydırma erişimini düzelt.
+- [ ] Anı fotoğraflarını soluk arka plan önizlemeleri olarak göster.
+- [ ] Kart açma ve kaydırma davranışını doğrula.
