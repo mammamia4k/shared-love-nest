@@ -22,3 +22,13 @@ export function buildJourneyItems(memories: JourneyItem[]): JourneyItem[] {
 export function journeyPosition(progress: number, count: number) {
   return Math.min(1, Math.max(0, progress)) * Math.max(0, count - 1);
 }
+
+export function journeyCylinderPose(distance: number) {
+  const angle = -distance * 45;
+  const radians = angle * Math.PI / 180;
+  return {
+    angle,
+    x: Math.sin(radians),
+    depth: Math.cos(radians) - 1,
+  };
+}

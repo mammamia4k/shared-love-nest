@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildJourneyItems, journeyPosition } from "@/lib/journey";
+import { buildJourneyItems, journeyPosition, journeyCylinderPose } from "@/lib/journey";
 
 describe("Empty memory slots", () => {
   it("adds exactly 100 uniquely identified blank cards without inventing dates or photos", () => {
@@ -17,5 +17,18 @@ describe("Empty memory slots", () => {
     expect(journeyPosition(0, 100)).toBe(0);
     expect(journeyPosition(1, 100)).toBe(99);
     expect(journeyPosition(0.5, 100)).toBe(49.5);
+  });
+});
+
+describe("Cylindrical journey", () => {
+  it("moves each card from left to right as scroll position advances", () => {
+    expect(journeyCylinderPose(1).x).toBeLessThan(0);
+    expect(journeyCylinderPose(0).x).toBe(0);
+    expect(journeyCylinderPose(-1).x).toBeGreaterThan(0);
+  });
+  it("covers a full 360 degree cylinder with the focused card at the front", () => {
+    expect(journeyCylinderPose(-4).angle - journeyCylinderPose(4).angle).toBe(360);
+    expect(journeyCylinderPose(0).depth).toBe(0);
+    expect(journeyCylinderPose(4).depth).toBe(-2);
   });
 });

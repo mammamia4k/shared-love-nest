@@ -157,13 +157,13 @@
   min-height: 480px;
   perspective: 1100px;
   perspective-origin: 50% 50%;
-  --journey-spiral-x: 1450px;
-  --journey-spiral-y: 1000px;
+  --journey-cylinder-radius: 1100px;
 }
 .journey-card {
   width: min(76vw, 720px);
   max-height: calc(100dvh - 300px);
   will-change: transform, opacity;
+  backface-visibility: hidden;
   box-shadow: var(--shadow-journey);
 }
 .journey-card-photo { height: min(43dvh, 560px); }
@@ -175,7 +175,7 @@
 }
 @keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.85; } }
 @media (max-width: 767px) {
-  .journey-stage { --journey-spiral-x: 780px; --journey-spiral-y: 720px; perspective: 950px; }
+  .journey-stage { --journey-cylinder-radius: 600px; perspective: 950px; }
   .journey-card { width: 88vw; max-height: calc(100dvh - 290px); }
   .journey-card-photo { height: min(36dvh, 330px); }
 }
