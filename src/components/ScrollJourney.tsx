@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart } from "lucide-react";
+import { Heart, X } from "lucide-react";
 
 type Item = {
   id: string;
@@ -15,6 +15,7 @@ const CARD_COUNT_SPACING = 0.55; // scroll progress between cards
 export function ScrollJourney() {
   const [items, setItems] = useState<Item[]>([]);
   const [progress, setProgress] = useState(0);
+  const [selected, setSelected] = useState<Item | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,7 +82,8 @@ export function ScrollJourney() {
           return (
             <article
               key={m.id}
-              className="absolute w-[86vw] max-w-xl overflow-hidden rounded-3xl border bg-card shadow-soft will-change-transform"
+              onClick={() => setSelected(m)}
+              className="absolute w-[86vw] max-w-xl cursor-pointer overflow-hidden rounded-3xl border bg-card shadow-soft will-change-transform"
               style={{
                 transform: `translate3d(${x}%, 0, ${z}px) rotateY(${rot}deg)`,
                 opacity,
@@ -107,6 +109,47 @@ export function ScrollJourney() {
           Kaydırmaya devam et
         </div>
       </div>
+
+      {/* detail view */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md"
+          onClick={() => setSelected(null)}
+        >
+          <article
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border bg-card shadow-soft"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {selected.url && (
+              <img src={selected.url} alt={selected.title} className="max-h-[55vh] w-full object-cover" />
+            )}
+            <div className="p-6 md:p-8">
+              <div className="mb-3 flex items-start justify-between gap-4">
+                <div>
+                  <p className="mb-1 flex items-center gap-2 text-sm text-muted-foreground">
+                    <Heart className="h-3.5 w-3.5 fill-primary text-primary" />
+                    {new Date(selected.memory_date).toLocaleDateString("tr-TR", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <h2 className="text-3xl md:text-4xl">{selected.title}</h2>
+                </div>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="rounded-full border p-2 text-muted-foreground hover:text-foreground"
+                  aria-label="Kapat"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <p className="whitespace-pre-wrap leading-relaxed">{selected.body}</p>
+            </div>
+          </article>
+        </div>
+      )}
     </div>
   );
 }
