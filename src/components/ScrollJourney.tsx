@@ -123,7 +123,7 @@ export function ScrollJourney() {
               </Button>
             );
           })}
-          <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-4">
+          <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
             <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowUp className="h-4 w-4" /></Button>
             <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
             <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowDown className="h-4 w-4" /></Button>
