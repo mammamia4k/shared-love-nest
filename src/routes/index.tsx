@@ -51,22 +51,22 @@ function Index() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <header className="mb-8 flex items-center justify-between">
+    <div className="px-4 py-8">
+      <header className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
         <h1 className="flex items-center gap-2 text-3xl md:text-4xl">
           <Heart className="h-7 w-7 fill-primary text-primary" /> Bizim Köşemiz
         </h1>
         <Button variant="ghost" size="sm" onClick={() => supabase.auth.signOut()}>Çıkış</Button>
       </header>
-      <Tabs defaultValue="memories">
-        <TabsList className="mb-6 grid w-full grid-cols-3">
-          <TabsTrigger value="memories">Anılar</TabsTrigger>
-          <TabsTrigger value="gallery">Fotoğraflar</TabsTrigger>
+      <Tabs defaultValue="journey">
+        <TabsList className="mx-auto mb-6 grid w-full max-w-3xl grid-cols-3">
+          <TabsTrigger value="journey">Yolculuk</TabsTrigger>
+          <TabsTrigger value="memories">Anı Ekle</TabsTrigger>
           <TabsTrigger value="plans">Planlar</TabsTrigger>
         </TabsList>
-        <TabsContent value="memories"><Memories /></TabsContent>
-        <TabsContent value="gallery"><Gallery /></TabsContent>
-        <TabsContent value="plans"><Plans /></TabsContent>
+        <TabsContent value="journey"><ScrollJourney /></TabsContent>
+        <TabsContent value="memories"><div className="mx-auto max-w-3xl"><Memories /></div></TabsContent>
+        <TabsContent value="plans"><div className="mx-auto max-w-3xl"><Plans /></div></TabsContent>
       </Tabs>
     </div>
   );
