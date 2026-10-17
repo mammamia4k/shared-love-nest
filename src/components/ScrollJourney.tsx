@@ -82,7 +82,8 @@ export function ScrollJourney() {
           return (
             <article
               key={m.id}
-              className="absolute w-[86vw] max-w-xl overflow-hidden rounded-3xl border bg-card shadow-soft will-change-transform"
+              onClick={() => setSelected(m)}
+              className="absolute w-[86vw] max-w-xl cursor-pointer overflow-hidden rounded-3xl border bg-card shadow-soft will-change-transform"
               style={{
                 transform: `translate3d(${x}%, 0, ${z}px) rotateY(${rot}deg)`,
                 opacity,
