@@ -18,6 +18,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Sadece ikimize özel anı defteri, fotoğraf albümü ve plan listesi." },
       { property: "og:title", content: "Bizim Köşemiz" },
       { property: "og:description", content: "Sadece ikimize özel anı defteri." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -52,14 +54,14 @@ function Index() {
 
   return (
     <div className="px-4 py-8">
-      <header className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
+      <header className="relative z-10 mx-auto mb-8 flex max-w-3xl items-center justify-between">
         <h1 className="flex items-center gap-2 text-3xl md:text-4xl">
           <Heart className="h-7 w-7 fill-primary text-primary" /> Bizim Köşemiz
         </h1>
         <Button variant="ghost" size="sm" onClick={() => supabase.auth.signOut()}>Çıkış</Button>
       </header>
       <Tabs defaultValue="journey">
-        <TabsList className="mx-auto mb-6 grid w-full max-w-3xl grid-cols-3">
+        <TabsList className="relative z-10 mx-auto mb-6 grid w-full max-w-3xl grid-cols-3">
           <TabsTrigger value="journey">Yolculuk</TabsTrigger>
           <TabsTrigger value="memories">Anı Ekle</TabsTrigger>
           <TabsTrigger value="plans">Planlar</TabsTrigger>
