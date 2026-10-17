@@ -14,13 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      memories: {
+        Row: {
+          author_email: string
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          memory_date: string
+          photo_path: string | null
+          title: string
+        }
+        Insert: {
+          author_email?: string
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          memory_date?: string
+          photo_path?: string | null
+          title: string
+        }
+        Update: {
+          author_email?: string
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          memory_date?: string
+          photo_path?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          author_email: string
+          created_at: string
+          done: boolean
+          id: string
+          plan_date: string | null
+          title: string
+        }
+        Insert: {
+          author_email?: string
+          created_at?: string
+          done?: boolean
+          id?: string
+          plan_date?: string | null
+          title: string
+        }
+        Update: {
+          author_email?: string
+          created_at?: string
+          done?: boolean
+          id?: string
+          plan_date?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_couple: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
