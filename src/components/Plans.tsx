@@ -22,7 +22,7 @@ export function Plans() {
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("plans").insert({ title, plan_date: date || null });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setTitle(""); setDate(""); load();
   }
 

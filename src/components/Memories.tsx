@@ -22,13 +22,13 @@ export function Memories() {
 
   async function load() {
     const { data, error } = await supabase.from("memories").select("*").order("memory_date", { ascending: false });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     const rows = (data ?? []) as Memory[];
     const paths = rows.filter((r) => r.photo_path).map((r) => r.photo_path!);
     if (paths.length) {
       const { data: signed } = await supabase.storage.from("photos").createSignedUrls(paths, 3600);
-      const map = new Map(signed?.map((s) => [s.path, s.signedUrl]));
-      rows.forEach((r) => r.photo_path && (r.url = map.get(r.photo_path)));
+      const map = new Map((signed ?? []).map((s) => [s.path ?? "", s.signedUrl] as const));
+      rows.forEach((r) => r.photo_path && (r.url = map.get(r.photo_path) ?? ""));
     }
     setItems(rows);
   }
