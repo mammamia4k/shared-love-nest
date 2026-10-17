@@ -6,7 +6,7 @@ import { isCoupleEmail } from "@/lib/couple";
 import { LoginCard } from "@/components/LoginCard";
 import { Memories } from "@/components/Memories";
 import { Plans } from "@/components/Plans";
-import { Gallery } from "@/components/Gallery";
+import { ScrollJourney } from "@/components/ScrollJourney";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart } from "lucide-react";
