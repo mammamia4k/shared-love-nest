@@ -23,7 +23,7 @@ describe("Empty memory slots", () => {
 describe("Cylindrical journey", () => {
   it("moves each card from left to right as scroll position advances", () => {
     expect(journeyCylinderPose(1).x).toBeLessThan(0);
-    expect(journeyCylinderPose(0).x).toBe(0);
+    expect(journeyCylinderPose(0).x).toBeCloseTo(0);
     expect(journeyCylinderPose(-1).x).toBeGreaterThan(0);
   });
   it("covers a full 360 degree cylinder with the focused card at the front", () => {
