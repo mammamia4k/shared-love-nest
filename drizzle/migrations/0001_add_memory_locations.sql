@@ -1,0 +1,2 @@
+ALTER TABLE public.memories ADD COLUMN location_name text, ADD COLUMN latitude double precision, ADD COLUMN longitude double precision;
+ALTER TABLE public.memories ADD CONSTRAINT memories_location_coordinates CHECK ((latitude IS NULL AND longitude IS NULL AND location_name IS NULL) OR (latitude IS NOT NULL AND longitude IS NOT NULL AND latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180 AND location_name IS NOT NULL AND length(trim(location_name)) > 0));

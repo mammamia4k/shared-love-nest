@@ -6,6 +6,9 @@ export type JourneyItem = {
   url?: string;
   empty?: boolean;
   slot?: number;
+  location_name?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export function buildJourneyItems(memories: JourneyItem[]): JourneyItem[] {
@@ -30,5 +33,6 @@ export function journeyCylinderPose(distance: number) {
     angle,
     x: Math.sin(radians),
     depth: Math.cos(radians) - 1,
+    rise: distance,
   };
 }

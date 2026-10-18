@@ -21,6 +21,9 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
           memory_date: string
           photo_path: string | null
           title: string
@@ -31,6 +34,9 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
           memory_date?: string
           photo_path?: string | null
           title: string
@@ -41,6 +47,9 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
           memory_date?: string
           photo_path?: string | null
           title?: string

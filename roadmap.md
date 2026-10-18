@@ -5,3 +5,7 @@
 - [x] Gerçek hesapla kart açma, fotoğraflı arka plan ve son karta ulaşmayı doğrula.
 - [x] Kartları büyüt, akışı spiral yap ve arka plan fotoğrafını belirginleştir.
 - [x] Güncel spiral görünümü ve kart açmayı gerçek hesapla doğrula.
+- [ ] Referanstaki katmanlı sarmal kart örüntüsünü uygula.
+- [ ] Anılara isteğe bağlı konum ekleme ve düzenleme ekle.
+- [ ] Dönen 3D dünyada konum işaretlerini ve ilgili anıya geçişi ekle.
+- [ ] Konum kaydetme, dünya işareti ve anıya geçiş akışını gerçek hesapla doğrula.
