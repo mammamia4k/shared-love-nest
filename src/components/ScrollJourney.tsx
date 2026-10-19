@@ -89,10 +89,11 @@ export function ScrollJourney() {
 
   function goToMemory(id: string) {
     const index = memoryIndexById(items, id);
-    if (index < 0) return;
+    const memory = items[index];
+    if (index < 0 || !memory) return;
     setWorldOpen(false);
     // Wait until the dialog restores scrolling before moving the journey.
-    window.setTimeout(() => { goTo(index); setSelected(items[index]); }, 160);
+    window.setTimeout(() => { goTo(index); window.setTimeout(() => setSelected(memory), 900); }, 160);
   }
 
   const located = memories.filter((memory) => validCoordinates(memory.latitude, memory.longitude));
