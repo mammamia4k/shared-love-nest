@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
+import { EMAIL_LOGIN_ENABLED } from "@/lib/auth-settings";
 
 export function LoginCard() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export function LoginCard() {
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
+    if (!EMAIL_LOGIN_ENABLED) return;
     if (!isCoupleEmail(email)) {
       toast.error("Bu e-posta ile giriş yapılamaz.");
       return;
@@ -30,6 +32,7 @@ export function LoginCard() {
 
   async function verify(e: React.FormEvent) {
     e.preventDefault();
+    if (!EMAIL_LOGIN_ENABLED) return;
     setBusy(true);
     const { error } = await supabase.auth.verifyOtp({
       email: email.trim().toLowerCase(),
@@ -46,7 +49,9 @@ export function LoginCard() {
         <Heart className="mx-auto mb-4 h-10 w-10 fill-primary text-primary" />
         <h1 className="mb-1 text-3xl">Bizim Köşemiz</h1>
         <p className="mb-6 text-sm text-muted-foreground">Sadece ikimiz için.</p>
-        {!sent ? (
+        {!EMAIL_LOGIN_ENABLED ? (
+          <p role="status" className="text-sm text-muted-foreground">E-posta ile giriş geçici olarak kapalı.</p>
+        ) : !sent ? (
           <form onSubmit={send} className="space-y-3">
             <Input type="email" required placeholder="E-posta adresin" value={email} onChange={(e) => setEmail(e.target.value)} />
             <Button className="w-full" disabled={busy}>Giriş kodu gönder</Button>

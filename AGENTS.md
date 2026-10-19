@@ -14,3 +14,4 @@
 - Use DOM perspective transforms for the scrollable memory gallery, preserving accessible card controls and readable text without a WebGL canvas.
 - Keep helical card positioning in the pure journey geometry helper so rotation and vertical layering can be tested independently of rendering.
 - Load the R3F globe lazily behind ClientOnly; saved optional coordinates share a tested conversion helper, and marker navigation resolves the saved memory ID rather than display order.
+- Control email login presentation through the shared auth-settings flag and keep it aligned with Cloud Auth provider settings, so temporary pauses preserve the login flow.
