@@ -31,4 +31,9 @@ describe("Cylindrical journey", () => {
     expect(journeyCylinderPose(0).depth).toBe(0);
     expect(journeyCylinderPose(4).depth).toBe(-2);
   });
+  it("layers successive turns vertically rather than overlapping them", () => {
+    expect(journeyCylinderPose(0).rise).toBe(0);
+    expect(journeyCylinderPose(8).rise).toBe(8);
+    expect(journeyCylinderPose(-8).rise).toBe(-8);
+  });
 });
