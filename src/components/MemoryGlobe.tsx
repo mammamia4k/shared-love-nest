@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Environment, Html, Lightformer, OrbitControls, useTexture } from "@react-three/drei";
-import { Color, SRGBColorSpace, type Mesh } from "three";
+import { Color, SRGBColorSpace, Mesh } from "three";
 import earth from "@/assets/earth.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
@@ -11,7 +11,7 @@ export type GlobeMarker = { id: string; title: string; latitude: number; longitu
 type Props = { markers: GlobeMarker[]; onMarker?: (id: string) => void; onPick?: (latitude: number, longitude: number) => void };
 
 function Earth({ markers, onMarker, onPick, markerColor }: Props & { markerColor: Color }) {
-  const earthRef = useRef<Mesh>(null);
+  const earthRef = useRef(new Mesh());
   const texture = useTexture(earth.url, (loaded) => { loaded.colorSpace = SRGBColorSpace; });
   return <>
     <mesh ref={earthRef} onClick={(event) => {
@@ -37,6 +37,16 @@ function Earth({ markers, onMarker, onPick, markerColor }: Props & { markerColor
   </>;
 }
 
+function GlobeCamera() {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const factor = Math.max(1, size.height / Math.max(size.width, 1));
+    camera.position.set(4 * factor, 3 * factor, -2 * factor);
+    camera.lookAt(0, 0, 0);
+  }, [camera, size.width, size.height]);
+  return null;
+}
+
 export default function MemoryGlobe(props: Props) {
   const [markerColor, setMarkerColor] = useState<Color | null>(null);
   useEffect(() => {
@@ -50,6 +60,7 @@ export default function MemoryGlobe(props: Props) {
   }, []);
   return <div className="globe-surface relative w-full touch-none" aria-label="Anıların dünya haritası">
     {markerColor && <Canvas dpr={1} camera={{ position: [4, 3, -2], fov: 48 }} gl={{ antialias: true }}>
+      <GlobeCamera />
       <ambientLight intensity={1.4} />
       <directionalLight position={[4, 5, 3]} intensity={2} />
       <Suspense fallback={null}>
@@ -58,7 +69,7 @@ export default function MemoryGlobe(props: Props) {
         </Environment>
         <Earth {...props} markerColor={markerColor} />
       </Suspense>
-      <OrbitControls makeDefault enablePan={false} enableDamping minDistance={3} maxDistance={8} />
+      <OrbitControls makeDefault enablePan={false} enableDamping minDistance={3} maxDistance={12} />
     </Canvas>}
     <a href="https://www.nasa.gov/" target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 text-xs text-muted-foreground">NASA · Blue Marble</a>
   </div>;
