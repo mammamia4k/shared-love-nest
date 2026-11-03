@@ -9,3 +9,4 @@
 - [x] Anılara isteğe bağlı konum ekleme ve düzenleme ekle.
 - [x] Dönen 3D dünyada konum işaretlerini ve ilgili anıya geçişi ekle.
 - [x] Konum kaydetme, dünya işareti ve anıya geçiş akışını gerçek hesapla doğrula.
+- [x] E-posta girişini yeniden aç ve anasayfaya erişimi doğrula.
