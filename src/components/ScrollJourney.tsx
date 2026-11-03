@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin } from "lucide-react";
@@ -96,7 +96,18 @@ export function ScrollJourney() {
     window.setTimeout(() => { goTo(index); window.setTimeout(() => setSelected(memory), 900); }, 160);
   }
 
-  const located = memories.filter((memory) => validCoordinates(memory.latitude, memory.longitude));
+  const located = useMemo(() => memories.filter((memory) => validCoordinates(memory.latitude, memory.longitude)), [memories]);
+  const markers = useMemo(() => located.map((memory) => ({ id: memory.id, title: `${memory.title} · ${memory.location_name}`, latitude: Number(memory.latitude), longitude: Number(memory.longitude) })), [located]);
+  // Follow the active card; empty or unlocated cards keep the last location seen before them.
+  let focusItem: JourneyItem | undefined;
+  for (let i = Math.min(activeIndex, items.length - 1); i >= 0; i--) {
+    const item = items[i];
+    if (item && validCoordinates(item.latitude, item.longitude)) { focusItem = item; break; }
+  }
+  focusItem ??= located[0];
+  const focusLat = focusItem ? Number(focusItem.latitude) : null;
+  const focusLng = focusItem ? Number(focusItem.longitude) : null;
+  const focus = useMemo(() => focusLat !== null && focusLng !== null ? { latitude: focusLat, longitude: focusLng } : null, [focusLat, focusLng]);
 
   if (loading) return <p className="py-20 text-center text-muted-foreground">Anılar yükleniyor…</p>;
 
@@ -139,6 +150,14 @@ export function ScrollJourney() {
               </Button>
             );
           })}
+          {located.length > 0 && (
+            <div className="journey-globe absolute right-4 top-4 z-[150] overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm md:right-8 md:top-8">
+              <ClientOnly fallback={null}><Suspense fallback={null}>
+                <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
+              </Suspense></ClientOnly>
+              {focusItem?.location_name && <p className="pointer-events-none absolute inset-x-0 bottom-[14%] mx-auto w-fit max-w-[80%] truncate rounded-full bg-background/85 px-3 py-1 text-center text-xs text-foreground"><MapPin className="mr-1 inline h-3 w-3 text-primary" />{focusItem.location_name}</p>}
+            </div>
+          )}
           <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
             <Button variant="ghost" size="icon" aria-label="Dünya haritasını aç" title="Dünya haritası" onClick={() => setWorldOpen(true)}><Globe className="h-5 w-5" /></Button>
             <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowLeft className="h-4 w-4" /></Button>
@@ -164,7 +183,7 @@ export function ScrollJourney() {
         <DialogContent className="max-h-[95dvh] max-w-5xl overflow-y-auto" aria-describedby={undefined}>
           <DialogTitle>Anıların dünyası</DialogTitle>
           <ClientOnly fallback={<div className="globe-surface" />}><Suspense fallback={<div className="globe-surface" />}>
-            <MemoryGlobe markers={located.map((memory) => ({ id: memory.id, title: `${memory.title} · ${memory.location_name}`, latitude: Number(memory.latitude), longitude: Number(memory.longitude) }))} onMarker={goToMemory} />
+            <MemoryGlobe markers={markers} onMarker={goToMemory} />
           </Suspense></ClientOnly>
           <div className="flex flex-wrap gap-2">
             {located.map((memory) => <Button key={memory.id} variant="outline" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.title} · {memory.location_name}</Button>)}
