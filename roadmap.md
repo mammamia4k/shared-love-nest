@@ -8,4 +8,4 @@
 - [x] Referanstaki katmanlı sarmal kart örüntüsünü uygula.
 - [x] Anılara isteğe bağlı konum ekleme ve düzenleme ekle.
 - [x] Dönen 3D dünyada konum işaretlerini ve ilgili anıya geçişi ekle.
-- [x] Konum kaydetme, dünya işareti ve anıya geçiş akışını gerçek hesapla doğrula.
+- [x] Konum kaydetme, dünya işareti ve anıya geçiş akışını gerçek hesapla doğrula.- [x] E-posta giri\u015Fini yeniden a� ve anasayfaya ula\u015F\u0131m\u0131 do\u011Frula.
