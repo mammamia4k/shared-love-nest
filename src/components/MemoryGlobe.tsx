@@ -9,7 +9,7 @@ import { locationToPoint, pointToLocation } from "@/lib/location";
 
 export type GlobeMarker = { id: string; title: string; latitude: number; longitude: number };
 type Focus = { latitude: number; longitude: number } | null;
-type Props = { markers: GlobeMarker[]; onMarker?: (id: string) => void; onPick?: (latitude: number, longitude: number) => void; focus?: Focus; compact?: boolean; activeId?: string | null };
+type Props = { markers: GlobeMarker[]; onMarker?: (id: string) => void; onPick?: (latitude: number, longitude: number) => void; focus?: Focus; compact?: boolean; fit?: boolean; activeId?: string | null };
 
 /** Smoothly turns the camera so the focused location faces the viewer. */
 function FocusCamera({ focus }: { focus: Focus }) {
