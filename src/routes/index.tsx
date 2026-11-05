@@ -62,7 +62,7 @@ function Index() {
       </header>
       <Tabs defaultValue="journey">
         <TabsList className="relative z-10 mx-auto mb-6 grid w-full max-w-3xl grid-cols-3">
-          <TabsTrigger value="journey">Yolculuk</TabsTrigger>
+          <TabsTrigger value="journey">Dergi</TabsTrigger>
           <TabsTrigger value="memories">Anı Ekle</TabsTrigger>
           <TabsTrigger value="plans">Planlar</TabsTrigger>
         </TabsList>
