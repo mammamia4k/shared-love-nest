@@ -37,3 +37,12 @@ describe("Cylindrical journey", () => {
     expect(journeyCylinderPose(-8).rise).toBe(-8);
   });
 });
+import { pageFlip } from "@/lib/journey";
+describe("pageFlip", () => {
+  it("turns the current sheet away when going forward", () => {
+    expect(pageFlip(2, 3)).toEqual({ under: 3, sheet: 2, direction: "forward" });
+  });
+  it("brings the previous sheet back over the current page", () => {
+    expect(pageFlip(3, 2)).toEqual({ under: 3, sheet: 2, direction: "back" });
+  });
+});
