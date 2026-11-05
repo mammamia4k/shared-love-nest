@@ -198,18 +198,33 @@ export function ScrollJourney() {
           </>}
         </DialogContent>
       </Dialog>
-      <Dialog open={worldOpen} onOpenChange={setWorldOpen}>
-        <DialogContent className="max-h-[95dvh] max-w-5xl overflow-y-auto" aria-describedby={undefined}>
-          <DialogTitle>Anıların dünyası</DialogTitle>
-          <ClientOnly fallback={<div className="globe-surface" />}><Suspense fallback={<div className="globe-surface" />}>
-            <MemoryGlobe markers={markers} onMarker={goToMemory} />
-          </Suspense></ClientOnly>
-          <div className="flex flex-wrap gap-2">
-            {located.map((memory) => <Button key={memory.id} variant="outline" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.title} · {memory.location_name}</Button>)}
-            {!located.length && <p className="text-sm text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+      {worldOpen && (isLargeScreen ? (
+        <Dialog open onOpenChange={(open) => { if (!open) setWorldOpen(false); }}>
+          <DialogContent className="max-h-[95dvh] max-w-5xl overflow-y-auto" aria-describedby={undefined}>
+            <DialogTitle>Anıların dünyası</DialogTitle>
+            <ClientOnly fallback={<div className="globe-surface" />}><Suspense fallback={<div className="globe-surface" />}>
+              <MemoryGlobe markers={markers} onMarker={goToMemory} />
+            </Suspense></ClientOnly>
+            <div className="flex flex-wrap gap-2">
+              {located.map((memory) => <Button key={memory.id} variant="outline" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.title} · {memory.location_name}</Button>)}
+              {!located.length && <p className="text-sm text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <WorldSheet onClose={() => setWorldOpen(false)}>
+          <div className="min-h-0 flex-1">
+            <ClientOnly fallback={<div className="h-full" />}><Suspense fallback={<div className="h-full" />}>
+              <MemoryGlobe fit markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
+            </Suspense></ClientOnly>
           </div>
-        </DialogContent>
-      </Dialog>
+          <div className="flex shrink-0 gap-2 overflow-x-auto border-t px-3 py-2">
+            {located.length
+              ? located.map((memory) => <Button key={memory.id} size="sm" variant="outline" className="shrink-0 text-xs" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.location_name}</Button>)
+              : <p className="text-xs text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+          </div>
+        </WorldSheet>
+      ))}
     </>
   );
 }
