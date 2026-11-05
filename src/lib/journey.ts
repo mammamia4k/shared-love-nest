@@ -26,6 +26,13 @@ export function journeyPosition(progress: number, count: number) {
   return Math.min(1, Math.max(0, progress)) * Math.max(0, count - 1);
 }
 
+/** Which page sits underneath and which sheet turns during a page flip. */
+export function pageFlip(from: number, to: number) {
+  return to > from
+    ? { under: to, sheet: from, direction: "forward" as const }
+    : { under: from, sheet: to, direction: "back" as const };
+}
+
 export function journeyCylinderPose(distance: number) {
   const angle = -distance * 45;
   const radians = angle * Math.PI / 180;
