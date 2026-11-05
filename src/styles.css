@@ -182,7 +182,20 @@
 }
 .globe-surface { height: min(58dvh, 620px); min-height: 280px; }
 .journey-globe { width: clamp(140px, 20vw, 360px); aspect-ratio: 1; }
+@property --journey-lift {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+.journey-stage { transition: --journey-lift 420ms ease; }
+/* Docked map panel lifts the active card so its photo and title stay tappable. */
+.journey-stage--world { --journey-lift: -14dvh; }
+.journey-world-sheet { bottom: 104px; height: min(56dvh, 440px); }
+@media (max-height: 720px) {
+  .journey-world-sheet { height: 50dvh; }
+}
 @media (prefers-reduced-motion: reduce) {
   .journey-card { will-change: auto; }
   .journey-background-photo { animation: none; }
+  .journey-stage { transition: none; }
 }
