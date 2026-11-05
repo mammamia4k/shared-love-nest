@@ -150,8 +150,8 @@ export function ScrollJourney() {
               </Button>
             );
           })}
-          {located.length > 0 && (
-            <div className="journey-globe absolute right-4 top-4 z-[150] overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm md:right-8 md:top-8">
+          {(
+            <div className="journey-globe absolute right-4 top-4 z-[150] overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm lg:right-10 lg:top-1/2 lg:-translate-y-1/2">
               <ClientOnly fallback={null}><Suspense fallback={null}>
                 <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
               </Suspense></ClientOnly>
