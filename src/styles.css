@@ -181,7 +181,7 @@
   .journey-card-photo { height: min(36dvh, 330px); }
 }
 .globe-surface { height: min(58dvh, 620px); min-height: 280px; }
-.journey-globe { width: clamp(150px, 22vw, 300px); aspect-ratio: 1; }
+.journey-globe { width: clamp(140px, 20vw, 360px); aspect-ratio: 1; }
 @media (prefers-reduced-motion: reduce) {
   .journey-card { will-change: auto; }
   .journey-background-photo { animation: none; }
