@@ -1,13 +1,27 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin } from "lucide-react";
+import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { buildJourneyItems, journeyPosition, journeyCylinderPose, type JourneyItem } from "@/lib/journey";
 import { validCoordinates, memoryIndexById } from "@/lib/location";
+import { WorldSheet } from "@/components/WorldSheet";
 
 const MemoryGlobe = lazy(() => import("@/components/MemoryGlobe"));
+
+/** Tracks a media query without hydration mismatch: starts false, syncs after mount. */
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const onChange = (event: MediaQueryListEvent) => setMatches(event.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
 
 export function ScrollJourney() {
   const [memories, setMemories] = useState<JourneyItem[]>([]);
@@ -16,6 +30,8 @@ export function ScrollJourney() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [worldOpen, setWorldOpen] = useState(false);
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const worldSheetOpen = worldOpen && !isLargeScreen;
   const trackRef = useRef<HTMLDivElement>(null);
   const items = buildJourneyItems(memories);
   const position = journeyPosition(progress, items.length);
@@ -121,7 +137,7 @@ export function ScrollJourney() {
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
       <div ref={trackRef} style={{ height: `${(items.length - 1) * 55 + 100}vh` }} className="relative z-10">
-        <div className="journey-stage sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+        <div className={`journey-stage sticky top-0 flex h-screen items-center justify-center overflow-hidden${worldSheetOpen ? " journey-stage--world" : ""}`}>
           {items.map((memory, index) => {
             const distance = index - position;
             const visible = Math.abs(distance) <= 10;
@@ -132,7 +148,7 @@ export function ScrollJourney() {
                 aria-label={memory.empty ? `Anı ${memory.slot} — aç` : `${memory.title} — aç`}
                 onClick={() => setSelected(memory)}
                 className="journey-card absolute block h-auto overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
-                style={{ transform: `translate3d(calc(${x} * var(--journey-cylinder-radius)), calc(${rise} * var(--journey-rise)), calc(${depth} * var(--journey-cylinder-radius))) rotateY(${angle}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: Math.round(100 + depth * 30), pointerEvents: index === activeIndex ? "auto" : "none" }}>
+                style={{ transform: `translate3d(calc(${x} * var(--journey-cylinder-radius)), calc(${rise} * var(--journey-rise) + var(--journey-lift, 0px)), calc(${depth} * var(--journey-cylinder-radius))) rotateY(${angle}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: Math.round(100 + depth * 30), pointerEvents: index === activeIndex ? "auto" : "none" }}>
                 {memory.url ? <img src={memory.url} alt={memory.title} className="journey-card-photo w-full object-cover" draggable={false} /> : (
                   <div className="journey-card-photo flex min-h-40 items-center justify-center bg-muted/50">
                     <ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" />
@@ -150,8 +166,8 @@ export function ScrollJourney() {
               </Button>
             );
           })}
-          {(
-            <div className="journey-globe absolute right-4 top-4 z-[150] overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm lg:right-10 lg:top-1/2 lg:-translate-y-1/2">
+          {isLargeScreen && (
+            <div className="journey-globe absolute right-10 top-1/2 z-[150] -translate-y-1/2 overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm">
               <ClientOnly fallback={null}><Suspense fallback={null}>
                 <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
               </Suspense></ClientOnly>
@@ -159,7 +175,10 @@ export function ScrollJourney() {
             </div>
           )}
           <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
-            <Button variant="ghost" size="icon" aria-label="Dünya haritasını aç" title="Dünya haritası" onClick={() => setWorldOpen(true)}><Globe className="h-5 w-5" /></Button>
+            <Button variant={worldOpen ? "default" : "outline"} className="h-9 gap-1.5 rounded-full px-3" aria-label="Dünya haritası" aria-expanded={worldOpen} title="Dünya haritası" onClick={() => setWorldOpen((open) => !open)}>
+              {worldOpen ? <X className="h-5 w-5" /> : <Globe className="h-5 w-5" />}
+              <span className="text-xs">Harita</span>
+            </Button>
             <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
             <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowRight className="h-4 w-4" /></Button>
@@ -179,18 +198,33 @@ export function ScrollJourney() {
           </>}
         </DialogContent>
       </Dialog>
-      <Dialog open={worldOpen} onOpenChange={setWorldOpen}>
-        <DialogContent className="max-h-[95dvh] max-w-5xl overflow-y-auto" aria-describedby={undefined}>
-          <DialogTitle>Anıların dünyası</DialogTitle>
-          <ClientOnly fallback={<div className="globe-surface" />}><Suspense fallback={<div className="globe-surface" />}>
-            <MemoryGlobe markers={markers} onMarker={goToMemory} />
-          </Suspense></ClientOnly>
-          <div className="flex flex-wrap gap-2">
-            {located.map((memory) => <Button key={memory.id} variant="outline" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.title} · {memory.location_name}</Button>)}
-            {!located.length && <p className="text-sm text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+      {worldOpen && (isLargeScreen ? (
+        <Dialog open onOpenChange={(open) => { if (!open) setWorldOpen(false); }}>
+          <DialogContent className="max-h-[95dvh] max-w-5xl overflow-y-auto" aria-describedby={undefined}>
+            <DialogTitle>Anıların dünyası</DialogTitle>
+            <ClientOnly fallback={<div className="globe-surface" />}><Suspense fallback={<div className="globe-surface" />}>
+              <MemoryGlobe markers={markers} onMarker={goToMemory} />
+            </Suspense></ClientOnly>
+            <div className="flex flex-wrap gap-2">
+              {located.map((memory) => <Button key={memory.id} variant="outline" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.title} · {memory.location_name}</Button>)}
+              {!located.length && <p className="text-sm text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <WorldSheet onClose={() => setWorldOpen(false)}>
+          <div className="min-h-0 flex-1">
+            <ClientOnly fallback={<div className="h-full" />}><Suspense fallback={<div className="h-full" />}>
+              <MemoryGlobe fit markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
+            </Suspense></ClientOnly>
           </div>
-        </DialogContent>
-      </Dialog>
+          <div className="flex shrink-0 gap-2 overflow-x-auto border-t px-3 py-2">
+            {located.length
+              ? located.map((memory) => <Button key={memory.id} size="sm" variant="outline" className="shrink-0 text-xs" onClick={() => goToMemory(memory.id)}><MapPin className="h-4 w-4" />{memory.location_name}</Button>)
+              : <p className="text-xs text-muted-foreground">Henüz konum eklenmiş bir anı yok.</p>}
+          </div>
+        </WorldSheet>
+      ))}
     </>
   );
 }

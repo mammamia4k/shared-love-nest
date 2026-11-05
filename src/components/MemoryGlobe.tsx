@@ -9,7 +9,7 @@ import { locationToPoint, pointToLocation } from "@/lib/location";
 
 export type GlobeMarker = { id: string; title: string; latitude: number; longitude: number };
 type Focus = { latitude: number; longitude: number } | null;
-type Props = { markers: GlobeMarker[]; onMarker?: (id: string) => void; onPick?: (latitude: number, longitude: number) => void; focus?: Focus; compact?: boolean; activeId?: string | null };
+type Props = { markers: GlobeMarker[]; onMarker?: (id: string) => void; onPick?: (latitude: number, longitude: number) => void; focus?: Focus; compact?: boolean; fit?: boolean; activeId?: string | null };
 
 /** Smoothly turns the camera so the focused location faces the viewer. */
 function FocusCamera({ focus }: { focus: Focus }) {
@@ -80,7 +80,7 @@ function MemoryGlobe(props: Props) {
     const pixel = probe.getImageData(0, 0, 1, 1).data;
     setMarkerColor(new Color().setRGB((pixel[0] ?? 0) / 255, (pixel[1] ?? 0) / 255, (pixel[2] ?? 0) / 255, SRGBColorSpace));
   }, []);
-  return <div className={`${props.compact ? "h-full" : "globe-surface"} relative w-full touch-none`} aria-label="Anıların dünya haritası">
+  return <div className={`${props.compact || props.fit ? "h-full" : "globe-surface"} relative w-full touch-none`} aria-label="Anıların dünya haritası">
     {markerColor && <Canvas dpr={1} camera={{ position: [4, 3, -2], fov: 48 }} gl={{ antialias: true, alpha: true }}>
       {!props.compact && <GlobeCamera />}
       <FocusCamera focus={props.focus ?? null} />
