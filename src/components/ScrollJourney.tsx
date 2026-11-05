@@ -1,13 +1,27 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin } from "lucide-react";
+import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { buildJourneyItems, journeyPosition, journeyCylinderPose, type JourneyItem } from "@/lib/journey";
 import { validCoordinates, memoryIndexById } from "@/lib/location";
+import { WorldSheet } from "@/components/WorldSheet";
 
 const MemoryGlobe = lazy(() => import("@/components/MemoryGlobe"));
+
+/** Tracks a media query without hydration mismatch: starts false, syncs after mount. */
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const onChange = (event: MediaQueryListEvent) => setMatches(event.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
 
 export function ScrollJourney() {
   const [memories, setMemories] = useState<JourneyItem[]>([]);
@@ -16,6 +30,8 @@ export function ScrollJourney() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [worldOpen, setWorldOpen] = useState(false);
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const worldSheetOpen = worldOpen && !isLargeScreen;
   const trackRef = useRef<HTMLDivElement>(null);
   const items = buildJourneyItems(memories);
   const position = journeyPosition(progress, items.length);
