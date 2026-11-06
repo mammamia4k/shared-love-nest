@@ -206,3 +206,56 @@ export function ScrollJourney() {
     </>
   );
 }
+
+const formatDate = (date: string, long = false) => new Date(`${date}T12:00:00`).toLocaleDateString("tr-TR", long ? { day: "numeric", month: "long", year: "numeric" } : { month: "long", year: "numeric" });
+
+function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; total: number; onOpen: () => void }) {
+  const cover = memories.find((memory) => memory.url);
+  const today = new Date().toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden bg-secondary">
+      {cover?.url && <img src={cover.url} alt={cover.title} className="absolute inset-0 h-full w-full object-cover" draggable={false} />}
+      <div className="magazine-cover-shade absolute inset-0" />
+      <div className="relative flex items-start justify-between px-6 pt-5 text-[10px] uppercase tracking-[0.3em] text-background md:px-8">
+        <span>Sayı 01</span><span>{today}</span>
+      </div>
+      <h2 className="magazine-masthead relative px-5 text-background md:px-7">Biz</h2>
+      <p className="relative px-6 text-xs uppercase tracking-[0.35em] text-background/90 md:px-8">Anılarımızın dergisi</p>
+      <div className="relative mt-auto space-y-3 px-6 pb-6 text-background md:px-8 md:pb-8">
+        {memories.slice(0, 3).map((memory, i) => (
+          <p key={memory.id} className="max-w-[85%] border-l-2 border-primary pl-3 font-serif text-lg leading-tight md:text-2xl">
+            {memory.title}<span className="ml-2 font-sans text-[10px] tracking-widest text-background/80">S. {i + 1}</span>
+          </p>
+        ))}
+        <Button onClick={onOpen} className="mt-2 rounded-full"><BookOpen className="h-4 w-4" />Okumaya başla · {total} sayfa</Button>
+      </div>
+    </div>
+  );
+}
+
+function MagazinePage({ item, number, total, onRead }: { item: JourneyItem; number: number; total: number; onRead: (item: JourneyItem) => void }) {
+  const title = item.empty ? `Anı ${item.slot}` : item.title;
+  return (
+    <article className="flex h-full flex-col bg-card px-5 pb-4 pt-4 text-card-foreground md:px-8 md:pt-6">
+      <header className="flex justify-between border-b border-foreground/20 pb-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+        <span>Biz · Anılar</span><span>{item.memory_date ? formatDate(item.memory_date) : "Yakında"}</span>
+      </header>
+      <div className="mt-4 h-[42%] shrink-0 overflow-hidden rounded-sm bg-muted/60">
+        {item.url ? <img src={item.url} alt={item.title} className="h-full w-full object-cover" draggable={false} />
+          : <div className="flex h-full items-center justify-center"><ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" /></div>}
+      </div>
+      <p className="mt-4 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-primary">
+        <Heart className="h-3 w-3" />{item.memory_date ? formatDate(item.memory_date, true) : `Anı ${item.slot}`}
+        {item.location_name && <span className="flex items-center gap-1 text-muted-foreground"><MapPin className="h-3 w-3" />{item.location_name}</span>}
+      </p>
+      <h3 className="mt-2 text-3xl leading-none md:text-5xl">{title}</h3>
+      <div className="magazine-body mt-4 min-h-0 flex-1 overflow-hidden text-sm leading-relaxed text-muted-foreground">
+        {item.body ? <p className="whitespace-pre-wrap">{item.body}</p> : <p className="italic">Bu sayfa yeni bir anıyı bekliyor.</p>}
+      </div>
+      <footer className="mt-3 flex items-center justify-between border-t border-foreground/20 pt-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+        <button type="button" className="underline-offset-4 hover:text-primary hover:underline" onClick={() => onRead(item)} aria-label={`${title} — aç`}>Devamını oku</button>
+        <span className="tabular-nums">{number} / {total}</span>
+      </footer>
+    </article>
+  );
+}
