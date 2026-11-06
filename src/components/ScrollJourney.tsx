@@ -250,7 +250,7 @@ function MagazinePage({ item, number, total, onRead }: { item: JourneyItem; numb
       </p>
       <h3 className="mt-2 text-3xl leading-none md:text-5xl">{title}</h3>
       <div className="magazine-body mt-4 min-h-0 flex-1 overflow-hidden text-sm leading-relaxed text-muted-foreground">
-        {item.body ? <p className="whitespace-pre-wrap">{item.body}</p> : <p className="italic">Bu sayfa yeni bir anıyı bekliyor.</p>}
+        {item.body ? <p className={`whitespace-pre-wrap${item.body.length > 120 ? " drop-cap" : ""}`}>{item.body}</p> : <p className="italic">Bu sayfa yeni bir anıyı bekliyor.</p>}
       </div>
       <footer className="mt-3 flex items-center justify-between border-t border-foreground/20 pt-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
         <button type="button" className="underline-offset-4 hover:text-primary hover:underline" onClick={() => onRead(item)} aria-label={`${title} — aç`}>Devamını oku</button>
