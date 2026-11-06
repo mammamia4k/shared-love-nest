@@ -1,10 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, ImageIcon, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
+import { Heart, ImageIcon, BookOpen, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { buildJourneyItems, journeyPosition, journeyCylinderPose, type JourneyItem } from "@/lib/journey";
+import { buildJourneyItems, pageFlip, type JourneyItem } from "@/lib/journey";
 import { validCoordinates, memoryIndexById } from "@/lib/location";
 import { WorldSheet } from "@/components/WorldSheet";
 
@@ -25,17 +25,19 @@ function useMediaQuery(query: string) {
 
 export function ScrollJourney() {
   const [memories, setMemories] = useState<JourneyItem[]>([]);
-  const [progress, setProgress] = useState(0);
+  const [page, setPage] = useState(0);
+  const [flip, setFlip] = useState<{ from: number; to: number } | null>(null);
+  const swipeX = useRef<number | null>(null);
   const [selected, setSelected] = useState<JourneyItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [worldOpen, setWorldOpen] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const worldSheetOpen = worldOpen && !isLargeScreen;
-  const trackRef = useRef<HTMLDivElement>(null);
   const items = buildJourneyItems(memories);
-  const position = journeyPosition(progress, items.length);
-  const activeIndex = Math.round(position);
+  const lastPage = items.length;
+  const shownPage = flip ? flip.to : page;
+  const activeIndex = Math.max(0, shownPage - 1);
   const photos = memories.filter((item) => item.url);
   const backgroundPhoto = items[activeIndex]?.url
     ? items[activeIndex]
@@ -68,40 +70,23 @@ export function ScrollJourney() {
     return () => { disposed = true; };
   }, []);
 
-  useEffect(() => {
-    let raf = 0;
-    let target = 0;
-    let current = 0;
-    let lastTime = 0;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const animate = (time: number) => {
-      const dt = Math.min((time - lastTime) / 1000 || 0.016, 0.05);
-      lastTime = time;
-      current = reducedMotion ? target : current + (target - current) * (1 - Math.exp(-14 * dt));
-      if (Math.abs(target - current) < 0.00001) current = target;
-      setProgress(current);
-      raf = current !== target ? requestAnimationFrame(animate) : 0;
-    };
-    const onScroll = () => {
-      const el = trackRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      target = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
-      if (!raf) { lastTime = performance.now(); raf = requestAnimationFrame(animate); }
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
-  }, [items.length, loading]);
-
-  function goTo(index: number) {
-    const track = trackRef.current;
-    if (!track) return;
-    const top = track.getBoundingClientRect().top + window.scrollY;
-    const fraction = Math.max(0, Math.min(items.length - 1, index)) / (items.length - 1);
-    window.scrollTo({ top: top + fraction * (track.offsetHeight - window.innerHeight), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  function turn(to: number) {
+    if (flip || to < 0 || to > lastPage || to === page) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPage(to);
+    else setFlip({ from: page, to });
   }
+  const turnRef = useRef(turn);
+  turnRef.current = turn;
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (document.querySelector("[role=dialog]")) return;
+      if (event.key === "ArrowRight") turnRef.current(page + 1);
+      if (event.key === "ArrowLeft") turnRef.current(page - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [page]);
 
   function goToMemory(id: string) {
     const index = memoryIndexById(items, id);
@@ -109,7 +94,7 @@ export function ScrollJourney() {
     if (index < 0 || !memory) return;
     setWorldOpen(false);
     // Wait until the dialog restores scrolling before moving the journey.
-    window.setTimeout(() => { goTo(index); window.setTimeout(() => setSelected(memory), 900); }, 160);
+    window.setTimeout(() => { turnRef.current(index + 1); window.setTimeout(() => setSelected(memory), 1100); }, 160);
   }
 
   const located = useMemo(() => memories.filter((memory) => validCoordinates(memory.latitude, memory.longitude)), [memories]);
@@ -136,36 +121,30 @@ export function ScrollJourney() {
         </div>
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
-      <div ref={trackRef} style={{ height: `${(items.length - 1) * 55 + 100}vh` }} className="relative z-10">
-        <div className={`journey-stage sticky top-0 flex h-screen items-center justify-center overflow-hidden${worldSheetOpen ? " journey-stage--world" : ""}`}>
-          {items.map((memory, index) => {
-            const distance = index - position;
-            const visible = Math.abs(distance) <= 10;
-            const { angle, x, depth, rise } = journeyCylinderPose(distance);
-            const opacity = 0.35 + 0.65 * (1 + depth / 2);
-            return (
-              <Button key={memory.id} variant="ghost" tabIndex={index === activeIndex ? 0 : -1}
-                aria-label={memory.empty ? `Anı ${memory.slot} — aç` : `${memory.title} — aç`}
-                onClick={() => setSelected(memory)}
-                className="journey-card absolute block h-auto overflow-hidden whitespace-normal rounded-lg border bg-card p-0 text-left font-normal text-card-foreground hover:bg-card"
-                style={{ transform: `translate3d(calc(${x} * var(--journey-cylinder-radius)), calc(${rise} * var(--journey-rise) + var(--journey-lift, 0px)), calc(${depth} * var(--journey-cylinder-radius))) rotateY(${angle}deg)`, opacity: visible ? opacity : 0, visibility: visible ? "visible" : "hidden", zIndex: Math.round(100 + depth * 30), pointerEvents: index === activeIndex ? "auto" : "none" }}>
-                {memory.url ? <img src={memory.url} alt={memory.title} className="journey-card-photo w-full object-cover" draggable={false} /> : (
-                  <div className="journey-card-photo flex min-h-40 items-center justify-center bg-muted/50">
-                    <ImageIcon className="h-12 w-12 stroke-1 text-muted-foreground/40" />
-                  </div>
-                )}
-                <div className="p-6 md:p-8">
-                  <p className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Heart className="h-3 w-3 text-primary" />
-                    {memory.memory_date ? new Date(`${memory.memory_date}T12:00:00`).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : String(memory.slot).padStart(3, "0")}
-                  </p>
-                  <h3 className="mb-2 text-2xl md:text-3xl">{memory.empty ? `Anı ${memory.slot}` : memory.title}</h3>
-                  {memory.location_name && <p className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />{memory.location_name}</p>}
-                  {memory.body && <p className="line-clamp-3 whitespace-pre-wrap text-sm text-muted-foreground">{memory.body}</p>}
+      <div className={`journey-stage relative z-10 flex items-center justify-center${worldSheetOpen ? " journey-stage--world" : ""}`}>
+          <div className="magazine relative"
+            onPointerDown={(event) => { swipeX.current = event.clientX; }}
+            onPointerUp={(event) => {
+              const start = swipeX.current; swipeX.current = null;
+              if (start === null || Math.abs(event.clientX - start) < 50) return;
+              turn(event.clientX < start ? page + 1 : page - 1);
+            }}>
+            {(() => {
+              const renderPage = (p: number) => p === 0
+                ? <MagazineCover memories={memories} total={lastPage} onOpen={() => turn(1)} />
+                : <MagazinePage item={items[p - 1]!} number={p} total={lastPage} onRead={setSelected} />;
+              if (!flip) return <div className="magazine-sheet">{renderPage(page)}</div>;
+              const { under, sheet, direction } = pageFlip(flip.from, flip.to);
+              return <>
+                <div className="magazine-sheet">{renderPage(under)}</div>
+                <div key={`${flip.from}-${flip.to}`} className={`magazine-sheet magazine-turning magazine-turning--${direction}`}
+                  onAnimationEnd={() => { setPage(flip.to); setFlip(null); }}>
+                  <div className="magazine-face">{renderPage(sheet)}</div>
+                  <div className="magazine-face magazine-face--back" />
                 </div>
-              </Button>
-            );
-          })}
+              </>;
+            })()}
+          </div>
           {isLargeScreen && (
             <div className="journey-globe absolute right-10 top-1/2 z-[150] -translate-y-1/2 overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm">
               <ClientOnly fallback={null}><Suspense fallback={null}>
@@ -179,11 +158,10 @@ export function ScrollJourney() {
               {worldOpen ? <X className="h-5 w-5" /> : <Globe className="h-5 w-5" />}
               <span className="text-xs">Harita</span>
             </Button>
-            <Button variant="outline" size="icon" aria-label="Önceki anı" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowLeft className="h-4 w-4" /></Button>
-            <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{activeIndex + 1} / {items.length}</span>
-            <Button variant="outline" size="icon" aria-label="Sonraki anı" disabled={activeIndex === items.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowRight className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" aria-label="Önceki sayfa" disabled={shownPage === 0} onClick={() => turn(page - 1)}><ArrowLeft className="h-4 w-4" /></Button>
+            <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{shownPage === 0 ? "Kapak" : `${shownPage} / ${lastPage}`}</span>
+            <Button variant="outline" size="icon" aria-label="Sonraki sayfa" disabled={shownPage === lastPage} onClick={() => turn(page + 1)}><ArrowRight className="h-4 w-4" /></Button>
           </div>
-        </div>
       </div>
       <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>
         <DialogContent aria-describedby={undefined} className="max-h-[90dvh] max-w-2xl overflow-y-auto rounded-lg bg-card p-0">
