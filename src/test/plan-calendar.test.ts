@@ -13,23 +13,23 @@ describe("buildMonthGrid", () => {
   it("starts weeks on Monday", () => {
     const grid = buildMonthGrid(2026, 10, today);
     // Kasım 2026 starts on a Sunday, so the first cell is Monday 26 Ekim.
-    expect(grid[0].iso).toBe("2026-10-26");
-    expect(grid[0].inMonth).toBe(false);
+    expect(grid.at(0)!.iso).toBe("2026-10-26");
+    expect(grid.at(0)!.inMonth).toBe(false);
   });
 
   it("marks only the displayed month's days as inMonth", () => {
     const grid = buildMonthGrid(2026, 10, today);
     const inMonth = grid.filter((d) => d.inMonth);
     expect(inMonth).toHaveLength(30); // Kasım has 30 days
-    expect(inMonth[0].day).toBe(1);
-    expect(inMonth[29].day).toBe(30);
+    expect(inMonth.at(0)!.day).toBe(1);
+    expect(inMonth.at(29)!.day).toBe(30);
   });
 
   it("flags today exactly once", () => {
     const grid = buildMonthGrid(2026, 10, today);
     const todays = grid.filter((d) => d.isToday);
     expect(todays).toHaveLength(1);
-    expect(todays[0].iso).toBe("2026-11-06");
+    expect(todays.at(0)!.iso).toBe("2026-11-06");
   });
 });
 
