@@ -118,7 +118,7 @@ export function ScrollJourney() {
       {backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-background/45" />
+          <div className="journey-photo-veil absolute inset-0" />
         </div>
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
@@ -162,7 +162,7 @@ export function ScrollJourney() {
               </>;
             })()}
           </div>
-          {isLargeScreen && !spread && (
+          {isLargeScreen && !spread && page > 0 && (
             <div className="journey-globe absolute right-10 top-1/2 z-[150] -translate-y-1/2 overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm">
               <ClientOnly fallback={null}><Suspense fallback={null}>
                 <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
