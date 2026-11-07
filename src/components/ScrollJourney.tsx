@@ -115,7 +115,7 @@ export function ScrollJourney() {
 
   return (
     <>
-      {backgroundPhoto?.url && (
+      {shownPage > 0 && backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
           <div className="journey-photo-veil absolute inset-0" />
