@@ -210,9 +210,10 @@
 
 /* Magazine */
 .magazine {
-  width: min(92vw, calc((100dvh - 320px) * 0.72), 640px);
+  width: min(94vw, calc((100dvh - 205px) * 0.72), 780px);
   aspect-ratio: 0.72;
   perspective: 2400px;
+  container-type: inline-size;
   transition: transform 420ms ease;
 }
 .journey-stage--world .magazine { transform: translateY(-22dvh) scale(0.55); }
@@ -241,13 +242,13 @@
   100% { transform: rotateY(0deg) skewY(0deg); }
 }
 .magazine-cover-shade { background: linear-gradient(180deg, oklch(0.2 0.03 20 / 0.55), transparent 35%, transparent 50%, oklch(0.2 0.03 20 / 0.75)); }
-.magazine-masthead { font-family: var(--font-serif); font-size: clamp(5rem, 18vw, 10rem); line-height: 0.85; font-weight: 700; letter-spacing: -0.04em; }
+.magazine-masthead { font-family: var(--font-serif); font-size: clamp(3.5rem, 32cqw, 11rem); line-height: 0.85; font-weight: 700; letter-spacing: -0.04em; }
 .magazine-body > p.drop-cap::first-letter { float: left; font-family: var(--font-serif); font-size: 3.2em; line-height: 0.8; padding-right: 0.08em; color: var(--primary); }
 @media (min-width: 768px) { .magazine-body { column-count: 2; column-gap: 1.5rem; } }
 @media (prefers-reduced-motion: reduce) { .magazine-turning { animation: none; } }
 
 /* Open book spread (large screens) */
-.magazine--spread { width: min(94vw, calc((100dvh - 320px) * 1.44), 1240px); aspect-ratio: 1.44; }
+.magazine--spread { width: min(96vw, calc((100dvh - 205px) * 1.44), 1500px); aspect-ratio: 1.44; }
 .spread-half { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; box-shadow: var(--shadow-journey); }
 .spread-half--left { left: 0; border-radius: 8px 0 0 8px; }
 .spread-half--right { right: 0; border-radius: 0 8px 8px 0; }
