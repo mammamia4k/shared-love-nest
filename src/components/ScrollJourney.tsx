@@ -170,14 +170,14 @@ export function ScrollJourney() {
               {focusItem?.location_name && <p className="pointer-events-none absolute inset-x-0 bottom-[14%] mx-auto w-fit max-w-[80%] truncate rounded-full bg-background/85 px-3 py-1 text-center text-xs text-foreground"><MapPin className="mr-1 inline h-3 w-3 text-primary" />{focusItem.location_name}</p>}
             </div>
           )}
-          <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
-            <Button variant={worldOpen ? "default" : "outline"} className="h-9 gap-1.5 rounded-full px-3" aria-label="Dünya haritası" aria-expanded={worldOpen} title="Dünya haritası" onClick={() => setWorldOpen((open) => !open)}>
-              {worldOpen ? <X className="h-5 w-5" /> : <Globe className="h-5 w-5" />}
+          <div className="absolute bottom-3 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-3 rounded-full bg-background/90 px-2 py-1 backdrop-blur-md">
+            <Button variant={worldOpen ? "default" : "outline"} className="h-8 gap-1.5 rounded-full px-2.5" aria-label="Dünya haritası" aria-expanded={worldOpen} title="Dünya haritası" onClick={() => setWorldOpen((open) => !open)}>
+              {worldOpen ? <X className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
               <span className="text-xs">Harita</span>
             </Button>
-            <Button variant="outline" size="icon" aria-label="Önceki sayfa" disabled={shownPage === 0} onClick={() => turn(page - 1)}><ArrowLeft className="h-4 w-4" /></Button>
-            <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{shownPage === 0 ? "Kapak" : `${shownPage} / ${lastPage}`}</span>
-            <Button variant="outline" size="icon" aria-label="Sonraki sayfa" disabled={shownPage === lastPage} onClick={() => turn(page + 1)}><ArrowRight className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Önceki sayfa" disabled={shownPage === 0} onClick={() => turn(page - 1)}><ArrowLeft className="h-4 w-4" /></Button>
+            <span className="min-w-16 text-center text-xs tabular-nums text-muted-foreground">{shownPage === 0 ? "Kapak" : `${shownPage} / ${lastPage}`}</span>
+            <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Sonraki sayfa" disabled={shownPage === lastPage} onClick={() => turn(page + 1)}><ArrowRight className="h-4 w-4" /></Button>
           </div>
       </div>
       <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>

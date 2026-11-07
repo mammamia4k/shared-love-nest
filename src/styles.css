@@ -156,6 +156,7 @@
 .journey-stage {
   height: calc(100dvh - 130px);
   min-height: 460px;
+  align-items: flex-start;
   perspective: 1100px;
   perspective-origin: 50% 50%;
   --journey-cylinder-radius: 760px;
@@ -211,7 +212,8 @@
 
 /* Magazine */
 .magazine {
-  width: min(94vw, calc((100dvh - 205px) * 0.72), 780px);
+  width: min(94vw, calc((100dvh - 200px) * 0.72), 780px);
+  margin-top: 12px;
   aspect-ratio: 0.72;
   perspective: 2400px;
   container-type: inline-size;
@@ -250,7 +252,7 @@
 @media (prefers-reduced-motion: reduce) { .magazine-turning { animation: none; } }
 
 /* Open book spread (large screens) */
-.magazine--spread { width: min(96vw, calc((100dvh - 205px) * 1.44), 1500px); aspect-ratio: 1.44; }
+.magazine--spread { width: min(96vw, calc((100dvh - 200px) * 1.44), 1500px); aspect-ratio: 1.44; }
 .spread-half { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; box-shadow: var(--shadow-magazine); }
 .spread-half--left { left: 0; border-radius: 8px 0 0 8px; }
 .spread-half--right { right: 0; border-radius: 0 8px 8px 0; }
