@@ -53,15 +53,15 @@ function Index() {
   }
 
   return (
-    <div className="px-4 py-8">
-      <header className="relative z-10 mx-auto mb-8 flex max-w-3xl items-center justify-between">
+    <div className="px-4 pb-4 pt-5">
+      <header className="relative z-10 mx-auto mb-4 flex max-w-3xl items-center justify-between">
         <h1 className="flex items-center gap-2 text-3xl md:text-4xl">
           <Heart className="h-7 w-7 fill-primary text-primary" /> Bizim Köşemiz
         </h1>
         <Button variant="ghost" size="sm" onClick={() => supabase.auth.signOut()}>Çıkış</Button>
       </header>
       <Tabs defaultValue="journey">
-        <TabsList className="relative z-10 mx-auto mb-6 grid w-full max-w-3xl grid-cols-3">
+        <TabsList className="relative z-10 mx-auto mb-4 grid w-full max-w-3xl grid-cols-3">
           <TabsTrigger value="journey">Dergi</TabsTrigger>
           <TabsTrigger value="memories">Anı Ekle</TabsTrigger>
           <TabsTrigger value="plans">Planlar</TabsTrigger>

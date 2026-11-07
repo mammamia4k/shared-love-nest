@@ -118,7 +118,7 @@ export function ScrollJourney() {
       {backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-background/45" />
+          <div className="journey-photo-veil absolute inset-0" />
         </div>
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
@@ -162,7 +162,7 @@ export function ScrollJourney() {
               </>;
             })()}
           </div>
-          {isLargeScreen && !spread && (
+          {isLargeScreen && !spread && page > 0 && (
             <div className="journey-globe absolute right-10 top-1/2 z-[150] -translate-y-1/2 overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm">
               <ClientOnly fallback={null}><Suspense fallback={null}>
                 <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
@@ -170,14 +170,14 @@ export function ScrollJourney() {
               {focusItem?.location_name && <p className="pointer-events-none absolute inset-x-0 bottom-[14%] mx-auto w-fit max-w-[80%] truncate rounded-full bg-background/85 px-3 py-1 text-center text-xs text-foreground"><MapPin className="mr-1 inline h-3 w-3 text-primary" />{focusItem.location_name}</p>}
             </div>
           )}
-          <div className="absolute bottom-8 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-4 rounded-full bg-background/90 px-3 py-2 backdrop-blur-md">
-            <Button variant={worldOpen ? "default" : "outline"} className="h-9 gap-1.5 rounded-full px-3" aria-label="Dünya haritası" aria-expanded={worldOpen} title="Dünya haritası" onClick={() => setWorldOpen((open) => !open)}>
-              {worldOpen ? <X className="h-5 w-5" /> : <Globe className="h-5 w-5" />}
+          <div className="absolute bottom-3 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-3 rounded-full bg-background/90 px-2 py-1 backdrop-blur-md">
+            <Button variant={worldOpen ? "default" : "outline"} className="h-8 gap-1.5 rounded-full px-2.5" aria-label="Dünya haritası" aria-expanded={worldOpen} title="Dünya haritası" onClick={() => setWorldOpen((open) => !open)}>
+              {worldOpen ? <X className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
               <span className="text-xs">Harita</span>
             </Button>
-            <Button variant="outline" size="icon" aria-label="Önceki sayfa" disabled={shownPage === 0} onClick={() => turn(page - 1)}><ArrowLeft className="h-4 w-4" /></Button>
-            <span className="min-w-20 text-center text-xs tabular-nums text-muted-foreground">{shownPage === 0 ? "Kapak" : `${shownPage} / ${lastPage}`}</span>
-            <Button variant="outline" size="icon" aria-label="Sonraki sayfa" disabled={shownPage === lastPage} onClick={() => turn(page + 1)}><ArrowRight className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Önceki sayfa" disabled={shownPage === 0} onClick={() => turn(page - 1)}><ArrowLeft className="h-4 w-4" /></Button>
+            <span className="min-w-16 text-center text-xs tabular-nums text-muted-foreground">{shownPage === 0 ? "Kapak" : `${shownPage} / ${lastPage}`}</span>
+            <Button variant="outline" size="icon" className="h-8 w-8" aria-label="Sonraki sayfa" disabled={shownPage === lastPage} onClick={() => turn(page + 1)}><ArrowRight className="h-4 w-4" /></Button>
           </div>
       </div>
       <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>
@@ -240,7 +240,7 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
       <p className="relative px-6 text-xs uppercase tracking-[0.35em] text-background/90 md:px-8">Anılarımızın dergisi</p>
       <div className="relative mt-auto space-y-3 px-6 pb-6 text-background md:px-8 md:pb-8">
         {memories.slice(0, 3).map((memory, i) => (
-          <p key={memory.id} className="max-w-[85%] border-l-2 border-primary pl-3 font-serif text-lg leading-tight md:text-2xl">
+          <p key={memory.id} className="magazine-cover-title max-w-[85%] border-l-2 border-primary pl-3 font-serif leading-tight">
             {memory.title}<span className="ml-2 font-sans text-[10px] tracking-widest text-background/80">S. {i + 1}</span>
           </p>
         ))}
