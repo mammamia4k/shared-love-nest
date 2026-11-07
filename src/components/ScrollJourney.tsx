@@ -240,7 +240,7 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
       <p className="relative px-6 text-xs uppercase tracking-[0.35em] text-background/90 md:px-8">Anılarımızın dergisi</p>
       <div className="relative mt-auto space-y-3 px-6 pb-6 text-background md:px-8 md:pb-8">
         {memories.slice(0, 3).map((memory, i) => (
-          <p key={memory.id} className="max-w-[85%] border-l-2 border-primary pl-3 font-serif text-lg leading-tight md:text-2xl">
+          <p key={memory.id} className="magazine-cover-title max-w-[85%] border-l-2 border-primary pl-3 font-serif leading-tight">
             {memory.title}<span className="ml-2 font-sans text-[10px] tracking-widest text-background/80">S. {i + 1}</span>
           </p>
         ))}
