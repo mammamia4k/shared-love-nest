@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, ImageIcon, BookOpen, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
@@ -38,6 +38,7 @@ export function ScrollJourney() {
   const lastPage = items.length;
   const shownPage = flip ? flip.to : page;
   const activeIndex = Math.max(0, shownPage - 1);
+  const spread = isLargeScreen && page > 0 && (!flip || (flip.from > 0 && flip.to > 0));
   const photos = memories.filter((item) => item.url);
   const backgroundPhoto = items[activeIndex]?.url
     ? items[activeIndex]
@@ -122,7 +123,7 @@ export function ScrollJourney() {
       )}
       {failed && <p role="alert" className="relative py-4 text-center text-destructive">Anılar yüklenemedi. Lütfen tekrar deneyin.</p>}
       <div className={`journey-stage relative z-10 flex items-center justify-center${worldSheetOpen ? " journey-stage--world" : ""}`}>
-          <div className="magazine relative"
+          <div className={`magazine relative${spread ? " magazine--spread" : ""}`}
             onPointerDown={(event) => { swipeX.current = event.clientX; }}
             onPointerUp={(event) => {
               const start = swipeX.current; swipeX.current = null;
@@ -133,6 +134,22 @@ export function ScrollJourney() {
               const renderPage = (p: number) => p === 0
                 ? <MagazineCover memories={memories} total={lastPage} onOpen={() => turn(1)} />
                 : <MagazinePage item={items[p - 1]!} number={p} total={lastPage} onRead={setSelected} />;
+              if (spread) {
+                const left = (p: number) => <SpreadPhoto item={items[p - 1]!} />;
+                const right = (p: number, globe: boolean) => <SpreadInfo item={items[p - 1]!} number={p} total={lastPage} onRead={setSelected}
+                  globe={globe ? <ClientOnly fallback={null}><Suspense fallback={null}><MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} /></Suspense></ClientOnly> : null} />;
+                if (!flip) return <><div className="spread-half spread-half--left">{left(page)}</div><div className="spread-half spread-half--right">{right(page, true)}</div></>;
+                const fwd = flip.to > flip.from;
+                return <>
+                  <div className="spread-half spread-half--left">{left(fwd ? flip.from : flip.to)}</div>
+                  <div className="spread-half spread-half--right">{right(fwd ? flip.to : flip.from, false)}</div>
+                  <div key={`${flip.from}-${flip.to}`} className={`spread-leaf magazine-turning--${fwd ? "forward" : "back"}`}
+                    onAnimationEnd={() => { setPage(flip.to); setFlip(null); }}>
+                    <div className="magazine-face spread-face">{right(fwd ? flip.from : flip.to, false)}</div>
+                    <div className="magazine-face spread-face spread-face--back">{left(fwd ? flip.to : flip.from)}</div>
+                  </div>
+                </>;
+              }
               if (!flip) return <div className="magazine-sheet">{renderPage(page)}</div>;
               const { under, sheet, direction } = pageFlip(flip.from, flip.to);
               return <>
@@ -145,7 +162,7 @@ export function ScrollJourney() {
               </>;
             })()}
           </div>
-          {isLargeScreen && (
+          {isLargeScreen && !spread && (
             <div className="journey-globe absolute right-10 top-1/2 z-[150] -translate-y-1/2 overflow-hidden rounded-full border bg-background/30 shadow-soft backdrop-blur-sm">
               <ClientOnly fallback={null}><Suspense fallback={null}>
                 <MemoryGlobe compact markers={markers} focus={focus} activeId={focusItem?.id ?? null} onMarker={goToMemory} />
@@ -258,4 +275,35 @@ function MagazinePage({ item, number, total, onRead }: { item: JourneyItem; numb
       </footer>
     </article>
   );
+}
+
+function SpreadPhoto({ item }: { item: JourneyItem }) {
+  return <div className="relative h-full overflow-hidden bg-muted">
+    {item.url ? <img src={item.url} alt={item.title} className="h-full w-full object-cover" draggable={false} />
+      : <div className="flex h-full items-center justify-center"><ImageIcon className="h-16 w-16 stroke-1 text-muted-foreground/40" /></div>}
+    <div className="spread-gutter spread-gutter--left" />
+  </div>;
+}
+
+function SpreadInfo({ item, number, total, onRead, globe }: { item: JourneyItem; number: number; total: number; onRead: (item: JourneyItem) => void; globe: ReactNode }) {
+  const title = item.empty ? `Anı ${item.slot}` : item.title;
+  return <article className="relative flex h-full flex-col bg-card px-8 pb-4 pt-6 text-card-foreground">
+    <div className="spread-gutter spread-gutter--right" />
+    <header className="flex justify-between border-b border-foreground/20 pb-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+      <span>Biz · Anılar</span><span>{item.memory_date ? formatDate(item.memory_date) : "Yakında"}</span>
+    </header>
+    <p className="mt-5 flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-primary"><Heart className="h-3 w-3" />{item.memory_date ? formatDate(item.memory_date, true) : `Anı ${item.slot}`}</p>
+    <h3 className="mt-2 text-4xl leading-none">{title}</h3>
+    <div className="mt-4 min-h-0 flex-1 overflow-hidden text-sm leading-relaxed text-muted-foreground">
+      {item.body ? <p className={`whitespace-pre-wrap${item.body.length > 120 ? " drop-cap" : ""}`}>{item.body}</p> : <p className="italic">Bu sayfa yeni bir anıyı bekliyor.</p>}
+    </div>
+    <div className="mt-3 flex shrink-0 items-center gap-4">
+      <div className="relative aspect-square w-36 shrink-0 overflow-hidden rounded-full border bg-background/40">{globe}</div>
+      <p className="flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="h-3 w-3 text-primary" />{item.location_name ?? "Konum eklenmemiş"}</p>
+    </div>
+    <footer className="mt-3 flex items-center justify-between border-t border-foreground/20 pt-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+      <button type="button" className="hover:text-primary hover:underline" onClick={() => onRead(item)} aria-label={`${title} — aç`}>Devamını oku</button>
+      <span className="tabular-nums">{number} / {total}</span>
+    </footer>
+  </article>;
 }
