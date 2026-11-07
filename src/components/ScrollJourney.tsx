@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, ImageIcon, BookOpen, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
@@ -285,7 +285,7 @@ function SpreadPhoto({ item }: { item: JourneyItem }) {
   </div>;
 }
 
-function SpreadInfo({ item, number, total, onRead, globe }: { item: JourneyItem; number: number; total: number; onRead: (item: JourneyItem) => void; globe: React.ReactNode }) {
+function SpreadInfo({ item, number, total, onRead, globe }: { item: JourneyItem; number: number; total: number; onRead: (item: JourneyItem) => void; globe: ReactNode }) {
   const title = item.empty ? `Anı ${item.slot}` : item.title;
   return <article className="relative flex h-full flex-col bg-card px-8 pb-4 pt-6 text-card-foreground">
     <div className="spread-gutter spread-gutter--right" />
