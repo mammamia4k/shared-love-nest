@@ -101,6 +101,7 @@
   --gradient-romance: radial-gradient(circle at 20% 10%, oklch(0.92 0.06 20) 0%, transparent 50%), radial-gradient(circle at 85% 80%, oklch(0.93 0.05 60) 0%, transparent 55%);
   --shadow-soft: 0 10px 40px -15px oklch(0.58 0.15 15 / 0.35);
   --shadow-journey: 0 25px 65px -25px oklch(0.28 0.04 20 / 0.28), 4px 0 0 oklch(0.89 0.02 35);
+  --shadow-magazine: 0 45px 110px -35px oklch(0.28 0.04 20 / 0.45), 0 0 0 1px oklch(0.28 0.04 20 / 0.08);
 }
 
 .dark {
@@ -219,7 +220,7 @@
 .journey-stage--world .magazine { transform: translateY(-22dvh) scale(0.55); }
 .magazine-sheet {
   position: absolute; inset: 0; overflow: hidden; border-radius: 2px 8px 8px 2px;
-  box-shadow: var(--shadow-journey); background: var(--card);
+  box-shadow: var(--shadow-magazine); background: var(--card);
 }
 .magazine-sheet::after {
   content: ""; position: absolute; inset: 0 auto 0 0; width: 28px; pointer-events: none;
@@ -227,7 +228,7 @@
 }
 .magazine-turning { overflow: visible; transform-origin: left center; transform-style: preserve-3d; z-index: 5; box-shadow: none; background: transparent; }
 .magazine-turning::after { display: none; }
-.magazine-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; border-radius: 2px 8px 8px 2px; box-shadow: var(--shadow-journey); }
+.magazine-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; border-radius: 2px 8px 8px 2px; box-shadow: var(--shadow-magazine); }
 .magazine-face--back { transform: rotateY(180deg); background: linear-gradient(270deg, var(--muted), var(--card) 70%); }
 .magazine-turning--forward { animation: page-turn-forward 1400ms cubic-bezier(0.37, 0, 0.25, 1) both; }
 .magazine-turning--back { animation: page-turn-back 1400ms cubic-bezier(0.37, 0, 0.25, 1) both; }
@@ -249,7 +250,7 @@
 
 /* Open book spread (large screens) */
 .magazine--spread { width: min(96vw, calc((100dvh - 205px) * 1.44), 1500px); aspect-ratio: 1.44; }
-.spread-half { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; box-shadow: var(--shadow-journey); }
+.spread-half { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; box-shadow: var(--shadow-magazine); }
 .spread-half--left { left: 0; border-radius: 8px 0 0 8px; }
 .spread-half--right { right: 0; border-radius: 0 8px 8px 0; }
 .spread-leaf { position: absolute; top: 0; bottom: 0; left: 50%; width: 50%; transform-origin: left center; transform-style: preserve-3d; z-index: 5; }
