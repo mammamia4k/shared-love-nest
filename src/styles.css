@@ -220,16 +220,16 @@
 .magazine-turning::after { display: none; }
 .magazine-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; border-radius: 2px 8px 8px 2px; box-shadow: var(--shadow-journey); }
 .magazine-face--back { transform: rotateY(180deg); background: linear-gradient(270deg, var(--muted), var(--card) 70%); }
-.magazine-turning--forward { animation: page-turn-forward 900ms cubic-bezier(0.45, 0.05, 0.3, 1) both; }
-.magazine-turning--back { animation: page-turn-back 900ms cubic-bezier(0.45, 0.05, 0.3, 1) both; }
+.magazine-turning--forward { animation: page-turn-forward 1400ms cubic-bezier(0.37, 0, 0.25, 1) both; }
+.magazine-turning--back { animation: page-turn-back 1400ms cubic-bezier(0.37, 0, 0.25, 1) both; }
 @keyframes page-turn-forward {
   0% { transform: rotateY(0deg) skewY(0deg); }
-  40% { transform: rotateY(-70deg) skewY(-3deg); }
+  50% { transform: rotateY(-90deg) skewY(-1deg); }
   100% { transform: rotateY(-180deg) skewY(0deg); }
 }
 @keyframes page-turn-back {
   0% { transform: rotateY(-180deg) skewY(0deg); }
-  60% { transform: rotateY(-110deg) skewY(3deg); }
+  50% { transform: rotateY(-90deg) skewY(1deg); }
   100% { transform: rotateY(0deg) skewY(0deg); }
 }
 .magazine-cover-shade { background: linear-gradient(180deg, oklch(0.2 0.03 20 / 0.55), transparent 35%, transparent 50%, oklch(0.2 0.03 20 / 0.75)); }
@@ -237,3 +237,15 @@
 .magazine-body > p.drop-cap::first-letter { float: left; font-family: var(--font-serif); font-size: 3.2em; line-height: 0.8; padding-right: 0.08em; color: var(--primary); }
 @media (min-width: 768px) { .magazine-body { column-count: 2; column-gap: 1.5rem; } }
 @media (prefers-reduced-motion: reduce) { .magazine-turning { animation: none; } }
+
+/* Open book spread (large screens) */
+.magazine--spread { width: min(94vw, calc((100dvh - 320px) * 1.44), 1240px); aspect-ratio: 1.44; }
+.spread-half { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; box-shadow: var(--shadow-journey); }
+.spread-half--left { left: 0; border-radius: 8px 0 0 8px; }
+.spread-half--right { right: 0; border-radius: 0 8px 8px 0; }
+.spread-leaf { position: absolute; top: 0; bottom: 0; left: 50%; width: 50%; transform-origin: left center; transform-style: preserve-3d; z-index: 5; }
+.spread-face { border-radius: 0 8px 8px 0; }
+.spread-face--back { transform: rotateY(180deg); border-radius: 8px 0 0 8px; }
+.spread-gutter { position: absolute; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 2; }
+.spread-gutter--left { right: 0; background: linear-gradient(270deg, oklch(0.28 0.04 20 / 0.28), transparent); }
+.spread-gutter--right { left: 0; background: linear-gradient(90deg, oklch(0.28 0.04 20 / 0.2), transparent); }
