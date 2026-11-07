@@ -153,8 +153,8 @@
 }
 
 .journey-stage {
-  height: calc(100dvh - 180px);
-  min-height: 480px;
+  height: calc(100dvh - 130px);
+  min-height: 460px;
   perspective: 1100px;
   perspective-origin: 50% 50%;
   --journey-cylinder-radius: 760px;
@@ -169,12 +169,20 @@
 }
 .journey-card-photo { height: min(43dvh, 560px); }
 .journey-background-photo {
-  opacity: 0.85;
-  filter: saturate(0.8) blur(5px);
-  transform: scale(1.06);
+  opacity: 0.22;
+  filter: saturate(0.5) blur(16px);
+  transform: scale(1.08);
   animation: journey-photo-appear 900ms ease-out both;
 }
-@keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.85; } }
+@keyframes journey-photo-appear { from { opacity: 0; } to { opacity: 0.22; } }
+/* Solid veil behind the magazine: the photo stays a hint, the cover holds the focus. */
+.journey-photo-veil {
+  background: radial-gradient(ellipse 62% 58% at 50% 46%,
+    color-mix(in oklab, var(--background) 97%, transparent) 0%,
+    color-mix(in oklab, var(--background) 92%, transparent) 42%,
+    color-mix(in oklab, var(--background) 74%, transparent) 68%,
+    color-mix(in oklab, var(--background) 58%, transparent) 100%);
+}
 @media (max-width: 767px) {
   .journey-stage { --journey-cylinder-radius: 420px; --journey-rise: 85px; perspective: 950px; }
   .journey-card { width: 88vw; max-height: calc(100dvh - 290px); }
