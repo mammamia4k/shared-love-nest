@@ -89,13 +89,12 @@ export function Memories() {
         </div>
       </form>
 
-      <ol className="relative space-y-6 border-l-2 border-accent pl-6">
+      <ol className="grid gap-5 sm:grid-cols-2">
         {items.map((m) => (
-          <li key={m.id} className="relative">
-            <span className="absolute -left-[33px] top-2 h-4 w-4 rounded-full border-4 border-background bg-primary" />
-            <article className="overflow-hidden rounded-3xl border bg-card shadow-soft">
-              {m.url && <img src={m.url} alt={m.title} className="max-h-96 w-full object-cover" />}
-              <div className="p-5">
+          <li key={m.id}>
+            <article className="flex h-full flex-col overflow-hidden rounded-3xl border bg-card shadow-soft transition-transform hover:-translate-y-1">
+              {m.url ? <img src={m.url} alt={m.title} className="aspect-[4/3] w-full object-cover" /> : <div className="aspect-[4/3] w-full bg-gradient-to-br from-secondary to-muted" />}
+              <div className="flex flex-1 flex-col p-5">
                 <div className="mb-1 flex items-start justify-between gap-2">
                   <h3 className="text-xl">{m.title}</h3>
                   <Button type="button" variant="ghost" size="icon" onClick={() => remove(m)} className="text-muted-foreground hover:text-destructive" aria-label="Sil">
@@ -105,13 +104,13 @@ export function Memories() {
                 <p className="mb-3 text-xs text-muted-foreground">
                   {new Date(m.memory_date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })} · {m.author_email.split("@")[0]}
                 </p>
-                <p className="whitespace-pre-wrap">{m.body}</p>
-                <div className="mt-4"><LocationPicker value={m.location_name && validCoordinates(m.latitude, m.longitude) ? { location_name: m.location_name, latitude: Number(m.latitude), longitude: Number(m.longitude) } : null} onChange={(value) => updateLocation(m.id, value)} /></div>
+                <p className="line-clamp-4 whitespace-pre-wrap text-sm">{m.body}</p>
+                <div className="mt-auto pt-4"><LocationPicker value={m.location_name && validCoordinates(m.latitude, m.longitude) ? { location_name: m.location_name, latitude: Number(m.latitude), longitude: Number(m.longitude) } : null} onChange={(value) => updateLocation(m.id, value)} /></div>
               </div>
             </article>
           </li>
         ))}
-        {!items.length && <p className="text-muted-foreground">İlk anınızı yazın ♥</p>}
+        {!items.length && <p className="col-span-full text-muted-foreground">İlk anınızı yazın ♥</p>}
       </ol>
     </div>
   );
