@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, ImageIcon, BookOpen, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Heart, ImageIcon, BookOpen, SlidersHorizontal, ArrowLeft, ArrowRight, Globe, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { buildJourneyItems, pageFlip, type JourneyItem } from "@/lib/journey";
@@ -226,12 +227,28 @@ export function ScrollJourney() {
 
 const formatDate = (date: string, long = false) => new Date(`${date}T12:00:00`).toLocaleDateString("tr-TR", long ? { day: "numeric", month: "long", year: "numeric" } : { month: "long", year: "numeric" });
 
+type CoverSettings = { photoId: string | null; x: number; y: number; zoom: number };
+const COVER_KEY = "biz-cover-settings";
+const DEFAULT_COVER: CoverSettings = { photoId: null, x: 50, y: 50, zoom: 1 };
+
 function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; total: number; onOpen: () => void }) {
-  const cover = memories.find((memory) => memory.url);
+  const [settings, setSettings] = useState<CoverSettings>(DEFAULT_COVER);
+  const [editing, setEditing] = useState(false);
+  useEffect(() => {
+    try { const raw = localStorage.getItem(COVER_KEY); if (raw) setSettings({ ...DEFAULT_COVER, ...JSON.parse(raw) }); } catch { /* ignore */ }
+  }, []);
+  const update = (next: Partial<CoverSettings>) => setSettings((prev) => {
+    const merged = { ...prev, ...next };
+    try { localStorage.setItem(COVER_KEY, JSON.stringify(merged)); } catch { /* ignore */ }
+    return merged;
+  });
+  const withPhotos = memories.filter((memory) => memory.url);
+  const cover = withPhotos.find((m) => m.id === settings.photoId) ?? withPhotos[0];
+  const imgStyle = { objectPosition: `${settings.x}% ${settings.y}%`, transform: `scale(${settings.zoom})`, transformOrigin: `${settings.x}% ${settings.y}%` };
   const today = new Date().toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-secondary">
-      {cover?.url && <img src={cover.url} alt={cover.title} className="absolute inset-0 h-full w-full object-cover" draggable={false} />}
+      {cover?.url && <img src={cover.url} alt={cover.title} style={imgStyle} className="absolute inset-0 h-full w-full object-cover" draggable={false} />}
       <div className="magazine-cover-shade absolute inset-0" />
       <div className="relative flex items-start justify-between px-6 pt-5 text-[10px] uppercase tracking-[0.3em] text-background md:px-8">
         <span>Sayı 01</span><span>{today}</span>
@@ -244,8 +261,40 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
             {memory.title}<span className="ml-2 font-sans text-[10px] tracking-widest text-background/80">S. {i + 1}</span>
           </p>
         ))}
-        <Button onClick={onOpen} className="mt-2 rounded-full"><BookOpen className="h-4 w-4" />Okumaya başla · {total} sayfa</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={onOpen} className="mt-2 rounded-full"><BookOpen className="h-4 w-4" />Okumaya başla · {total} sayfa</Button>
+          {withPhotos.length > 0 && (
+            <Button variant="secondary" onClick={() => setEditing(true)} className="mt-2 rounded-full"><SlidersHorizontal className="h-4 w-4" />Kapağı düzenle</Button>
+          )}
+        </div>
       </div>
+      <Dialog open={editing} onOpenChange={setEditing}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto">
+          <DialogTitle>Kapak fotoğrafı</DialogTitle>
+          <div className="grid grid-cols-4 gap-2">
+            {withPhotos.map((m) => (
+              <button key={m.id} type="button" onClick={() => update({ photoId: m.id, x: 50, y: 50, zoom: 1 })} aria-label={m.title}
+                className={`aspect-square overflow-hidden rounded-md border-2 ${cover?.id === m.id ? "border-primary" : "border-transparent"}`}>
+                <img src={m.url!} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+          {cover?.url && (
+            <div className="mx-auto aspect-[0.72] w-40 overflow-hidden rounded-md bg-secondary">
+              <img src={cover.url} alt="" style={imgStyle} className="h-full w-full object-cover" />
+            </div>
+          )}
+          <div className="space-y-4">
+            <label className="block space-y-2 text-sm">Yatay konum<Slider value={[settings.x]} min={0} max={100} step={1} onValueChange={([v]) => update({ x: v })} /></label>
+            <label className="block space-y-2 text-sm">Dikey konum<Slider value={[settings.y]} min={0} max={100} step={1} onValueChange={([v]) => update({ y: v })} /></label>
+            <label className="block space-y-2 text-sm">Yakınlaştırma<Slider value={[settings.zoom]} min={1} max={3} step={0.05} onValueChange={([v]) => update({ zoom: v })} /></label>
+          </div>
+          <div className="flex justify-between">
+            <Button variant="ghost" onClick={() => update({ x: 50, y: 50, zoom: 1 })}>Sıfırla</Button>
+            <Button onClick={() => setEditing(false)}>Tamam</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
