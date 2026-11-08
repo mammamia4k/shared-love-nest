@@ -268,3 +268,19 @@
 .spread-gutter { position: absolute; top: 0; bottom: 0; width: 48px; pointer-events: none; z-index: 2; }
 .spread-gutter--left { right: 0; background: linear-gradient(270deg, oklch(0.28 0.04 20 / 0.28), transparent); }
 .spread-gutter--right { left: 0; background: linear-gradient(90deg, oklch(0.28 0.04 20 / 0.2), transparent); }
+
+/* Calm romantic scene behind the magazine */
+.journey-scene { background: linear-gradient(160deg, color-mix(in oklab, var(--secondary) 55%, var(--background)), var(--background) 45%, color-mix(in oklab, var(--muted) 80%, var(--background))); }
+.journey-scene::after { content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--foreground) 8%, transparent) 1px, transparent 0);
+  background-size: 26px 26px; mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, black 85%); }
+.journey-scene-glow { position: absolute; width: 55vmax; height: 55vmax; border-radius: 9999px; filter: blur(90px); opacity: 0.55; animation: journey-glow 26s ease-in-out infinite alternate; }
+.journey-scene-glow--pink { top: -20vmax; left: -15vmax; background: color-mix(in oklab, var(--primary) 45%, transparent); }
+.journey-scene-glow--blue { bottom: -22vmax; right: -15vmax; background: color-mix(in oklab, var(--accent) 90%, transparent); animation-delay: -13s; }
+.journey-scene-rings { position: absolute; left: 50%; top: 52%; width: 120vmin; height: 120vmin; transform: translate(-50%, -50%); border-radius: 9999px;
+  background: repeating-radial-gradient(circle, transparent 0 46px, color-mix(in oklab, var(--primary) 12%, transparent) 46px 47px);
+  mask-image: radial-gradient(circle, transparent 28%, black 45%, transparent 72%); }
+.journey-scene-heart { position: absolute; bottom: -40px; color: color-mix(in oklab, var(--primary) 35%, transparent); animation: journey-heart linear infinite; }
+@keyframes journey-glow { to { transform: translate(8vmax, 6vmax) scale(1.1); } }
+@keyframes journey-heart { 0% { transform: translateY(0) rotate(-10deg); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 0.8; } 100% { transform: translateY(-110vh) rotate(12deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .journey-scene-glow, .journey-scene-heart { animation: none; } .journey-scene-heart { display: none; } }

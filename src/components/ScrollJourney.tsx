@@ -116,6 +116,14 @@ export function ScrollJourney() {
 
   return (
     <>
+      <div className="journey-scene pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="journey-scene-glow journey-scene-glow--pink" />
+        <div className="journey-scene-glow journey-scene-glow--blue" />
+        <div className="journey-scene-rings" />
+        {Array.from({ length: 9 }, (_, i) => (
+          <span key={i} className="journey-scene-heart" style={{ left: `${8 + i * 10.5}%`, animationDelay: `${i * 2.3}s`, animationDuration: `${16 + (i % 4) * 4}s`, fontSize: `${12 + (i % 3) * 6}px` }}>♥</span>
+        ))}
+      </div>
       {shownPage > 0 && backgroundPhoto?.url && (
         <div className="journey-photo-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <img key={backgroundPhoto.id} src={backgroundPhoto.url} alt="" className="journey-background-photo h-full w-full object-cover" />
