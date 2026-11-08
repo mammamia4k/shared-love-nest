@@ -285,9 +285,9 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
             </div>
           )}
           <div className="space-y-4">
-            <label className="block space-y-2 text-sm">Yatay konum<Slider value={[settings.x]} min={0} max={100} step={1} onValueChange={([v]) => update({ x: v })} /></label>
-            <label className="block space-y-2 text-sm">Dikey konum<Slider value={[settings.y]} min={0} max={100} step={1} onValueChange={([v]) => update({ y: v })} /></label>
-            <label className="block space-y-2 text-sm">Yakınlaştırma<Slider value={[settings.zoom]} min={1} max={3} step={0.05} onValueChange={([v]) => update({ zoom: v })} /></label>
+            <label className="block space-y-2 text-sm">Yatay konum<Slider value={[settings.x]} min={0} max={100} step={1} onValueChange={([v]) => update({ x: v ?? 50 })} /></label>
+            <label className="block space-y-2 text-sm">Dikey konum<Slider value={[settings.y]} min={0} max={100} step={1} onValueChange={([v]) => update({ y: v ?? 50 })} /></label>
+            <label className="block space-y-2 text-sm">Yakınlaştırma<Slider value={[settings.zoom]} min={1} max={3} step={0.05} onValueChange={([v]) => update({ zoom: v ?? 1 })} /></label>
           </div>
           <div className="flex justify-between">
             <Button variant="ghost" onClick={() => update({ x: 50, y: 50, zoom: 1 })}>Sıfırla</Button>
