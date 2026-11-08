@@ -12,4 +12,4 @@
 - [x] E-posta girişini yeniden aç ve anasayfaya erişimi doğrula.
 - [x] Anı kartlarını sayfa çevirme animasyonlu dergiye ve kapağa dönüştür.
 - [x] Kapak sayfasında arka plan fotoğrafını tamamen gizle.
-- [ ] Site renklerini nude tonlarına çevir.
+- [x] Site renklerini nude tonlarına çevir.
