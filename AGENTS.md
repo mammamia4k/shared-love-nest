@@ -16,3 +16,4 @@
 - Load the R3F globe lazily behind ClientOnly; saved optional coordinates share a tested conversion helper, and marker navigation resolves the saved memory ID rather than display order.
 - Control email login presentation through the shared auth-settings flag and keep it aligned with Cloud Auth provider settings, so temporary pauses preserve the login flow.
 - Keep the small-screen world map a docked, non-modal sheet with its own close control, so opening the map never blocks the memory cards; lift the active card while it is open instead of covering it.
+- Store cover photo memory IDs and crop settings in a couple-restricted singleton row; keep editor drafts local until explicit save, and refresh shared settings on focus and periodically so both accounts use the same cover without sharing expiring photo URLs.
