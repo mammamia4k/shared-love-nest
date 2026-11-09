@@ -14,3 +14,4 @@
 - [x] Kapak sayfasında arka plan fotoğrafını tamamen gizle.
 - [x] Site renklerini nude tonlarına çevir.
 - [x] Kapak fotoğrafını ve kırpma ayarlarını iki hesap için ortak kaydet ve doğrula.
+- [ ] Ortak takvimde plan saatlerini kaydet, tarihe ve saate göre göster ve gerçek hesapla doğrula.
