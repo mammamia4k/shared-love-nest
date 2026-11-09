@@ -53,7 +53,7 @@ export function monthLabel(year: number, month: number): string {
 }
 
 /** Groups plan ids by their ISO plan_date for quick lookup per cell. */
-export function groupByDate<T extends { plan_date: string | null }>(plans: T[]): Map<string, T[]> {
+export function groupByDate<T extends { plan_date: string | null; plan_time?: string | null }>(plans: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();
   for (const plan of plans) {
     if (!plan.plan_date) continue;
@@ -61,5 +61,13 @@ export function groupByDate<T extends { plan_date: string | null }>(plans: T[]):
     list.push(plan);
     map.set(plan.plan_date, list);
   }
+  for (const list of map.values()) {
+    list.sort((a, b) => (a.plan_time ?? "24:00").localeCompare(b.plan_time ?? "24:00"));
+  }
   return map;
+}
+
+/** Shared wall-clock times must not shift with the viewer's timezone. */
+export function planTimeLabel(time: string | null): string {
+  return time ? time.slice(0, 5) : "Saat belirtilmedi";
 }

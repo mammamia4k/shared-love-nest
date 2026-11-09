@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildMonthGrid, groupByDate, monthLabel, toISODate } from "@/lib/plan-calendar";
+import { buildMonthGrid, groupByDate, monthLabel, toISODate, planTimeLabel } from "@/lib/plan-calendar";
 
 describe("buildMonthGrid", () => {
   // Fixed "today" so tests are deterministic.
@@ -13,23 +13,23 @@ describe("buildMonthGrid", () => {
   it("starts weeks on Monday", () => {
     const grid = buildMonthGrid(2026, 10, today);
     // Kasım 2026 starts on a Sunday, so the first cell is Monday 26 Ekim.
-    expect(grid.at(0)!.iso).toBe("2026-10-26");
-    expect(grid.at(0)!.inMonth).toBe(false);
+    expect(grid.at(0)?.iso).toBe("2026-10-26");
+    expect(grid.at(0)?.inMonth).toBe(false);
   });
 
   it("marks only the displayed month's days as inMonth", () => {
     const grid = buildMonthGrid(2026, 10, today);
     const inMonth = grid.filter((d) => d.inMonth);
     expect(inMonth).toHaveLength(30); // Kasım has 30 days
-    expect(inMonth.at(0)!.day).toBe(1);
-    expect(inMonth.at(29)!.day).toBe(30);
+    expect(inMonth.at(0)?.day).toBe(1);
+    expect(inMonth.at(29)?.day).toBe(30);
   });
 
   it("flags today exactly once", () => {
     const grid = buildMonthGrid(2026, 10, today);
     const todays = grid.filter((d) => d.isToday);
     expect(todays).toHaveLength(1);
-    expect(todays.at(0)!.iso).toBe("2026-11-06");
+    expect(todays.at(0)?.iso).toBe("2026-11-06");
   });
 });
 
@@ -50,6 +50,19 @@ describe("groupByDate", () => {
 });
 
 describe("labels", () => {
+  it("keeps shared plan times unchanged without timezone conversion", () => {
+    expect(planTimeLabel("19:30:00")).toBe("19:30");
+    expect(planTimeLabel(null)).toBe("Saat belirtilmedi");
+  });
+
+  it("orders a day's plans by time, with unspecified times last", () => {
+    const plans = [
+      { id: "no-time", plan_date: "2026-11-09", plan_time: null },
+      { id: "evening", plan_date: "2026-11-09", plan_time: "19:30:00" },
+      { id: "morning", plan_date: "2026-11-09", plan_time: "09:00:00" },
+    ];
+    expect(groupByDate(plans).get("2026-11-09")?.map(p => p.id)).toEqual(["morning", "evening", "no-time"]);
+  });
   it("formats the month label in Turkish", () => {
     expect(monthLabel(2026, 10)).toBe("Kasım 2026");
   });

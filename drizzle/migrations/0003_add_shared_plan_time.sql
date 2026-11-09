@@ -1,0 +1,2 @@
+ALTER TABLE public.plans ADD COLUMN plan_time time without time zone;
+COMMENT ON COLUMN public.plans.plan_time IS 'Optional shared local wall-clock time for a plan, displayed without timezone conversion.';
