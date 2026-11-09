@@ -13,3 +13,4 @@
 - [x] Anı kartlarını sayfa çevirme animasyonlu dergiye ve kapağa dönüştür.
 - [x] Kapak sayfasında arka plan fotoğrafını tamamen gizle.
 - [x] Site renklerini nude tonlarına çevir.
+- [x] Kapak fotoğrafını ve kırpma ayarlarını iki hesap için ortak kaydet ve doğrula.

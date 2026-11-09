@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { buildJourneyItems, pageFlip, type JourneyItem } from "@/lib/journey";
 import { validCoordinates, memoryIndexById } from "@/lib/location";
 import { WorldSheet } from "@/components/WorldSheet";
+import { useSharedCover } from "@/hooks/use-shared-cover";
+import { DEFAULT_COVER, type CoverSettings } from "@/lib/cover-settings";
 
 const MemoryGlobe = lazy(() => import("@/components/MemoryGlobe"));
 
@@ -25,6 +27,7 @@ function useMediaQuery(query: string) {
 }
 
 export function ScrollJourney() {
+  const sharedCover = useSharedCover();
   const [memories, setMemories] = useState<JourneyItem[]>([]);
   const [page, setPage] = useState(0);
   const [flip, setFlip] = useState<{ from: number; to: number } | null>(null);
@@ -141,7 +144,7 @@ export function ScrollJourney() {
             }}>
             {(() => {
               const renderPage = (p: number) => p === 0
-                ? <MagazineCover memories={memories} total={lastPage} onOpen={() => turn(1)} />
+                ? <MagazineCover memories={memories} total={lastPage} onOpen={() => turn(1)} sharedCover={sharedCover} />
                 : <MagazinePage item={items[p - 1]!} number={p} total={lastPage} onRead={setSelected} />;
               if (spread) {
                 const left = (p: number) => <SpreadPhoto item={items[p - 1]!} />;
@@ -235,21 +238,12 @@ export function ScrollJourney() {
 
 const formatDate = (date: string, long = false) => new Date(`${date}T12:00:00`).toLocaleDateString("tr-TR", long ? { day: "numeric", month: "long", year: "numeric" } : { month: "long", year: "numeric" });
 
-type CoverSettings = { photoId: string | null; x: number; y: number; zoom: number };
-const COVER_KEY = "biz-cover-settings";
-const DEFAULT_COVER: CoverSettings = { photoId: null, x: 50, y: 50, zoom: 1 };
-
-function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; total: number; onOpen: () => void }) {
-  const [settings, setSettings] = useState<CoverSettings>(DEFAULT_COVER);
+function MagazineCover({ memories, total, onOpen, sharedCover }: { memories: JourneyItem[]; total: number; onOpen: () => void; sharedCover: ReturnType<typeof useSharedCover> }) {
+  const [draft, setDraft] = useState<CoverSettings>(DEFAULT_COVER);
   const [editing, setEditing] = useState(false);
-  useEffect(() => {
-    try { const raw = localStorage.getItem(COVER_KEY); if (raw) setSettings({ ...DEFAULT_COVER, ...JSON.parse(raw) }); } catch { /* ignore */ }
-  }, []);
-  const update = (next: Partial<CoverSettings>) => setSettings((prev) => {
-    const merged = { ...prev, ...next };
-    try { localStorage.setItem(COVER_KEY, JSON.stringify(merged)); } catch { /* ignore */ }
-    return merged;
-  });
+  const settings = editing ? draft : sharedCover.settings;
+  const update = (next: Partial<CoverSettings>) => setDraft((prev) => ({ ...prev, ...next }));
+  const openEditor = () => { setDraft(sharedCover.settings); setEditing(true); };
   const withPhotos = memories.filter((memory) => memory.url);
   const cover = withPhotos.find((m) => m.id === settings.photoId) ?? withPhotos[0];
   const imgStyle = { objectPosition: `${settings.x}% ${settings.y}%`, transform: `scale(${settings.zoom})`, transformOrigin: `${settings.x}% ${settings.y}%` };
@@ -272,19 +266,22 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
         <div className="flex flex-wrap gap-2">
           <Button onClick={onOpen} className="mt-2 rounded-full"><BookOpen className="h-4 w-4" />Okumaya başla · {total} sayfa</Button>
           {withPhotos.length > 0 && (
-            <Button variant="secondary" onClick={() => setEditing(true)} className="mt-2 rounded-full"><SlidersHorizontal className="h-4 w-4" />Kapağı düzenle</Button>
+            <Button variant="secondary" onClick={openEditor} disabled={sharedCover.loading} className="mt-2 rounded-full"><SlidersHorizontal className="h-4 w-4" />Kapağı düzenle</Button>
           )}
         </div>
       </div>
-      <Dialog open={editing} onOpenChange={setEditing}>
+      {sharedCover.error && !editing && <p role="alert" className="relative bg-card px-6 py-2 text-sm text-destructive">{sharedCover.error}</p>}
+      <Dialog open={editing} onOpenChange={(open) => { if (!sharedCover.saving) setEditing(open); }}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto">
           <DialogTitle>Kapak fotoğrafı</DialogTitle>
+          {sharedCover.legacy && <p className="text-sm text-muted-foreground">Bu cihazdaki kapağı ikiniz için kaydedebilirsiniz.</p>}
+          <fieldset disabled={sharedCover.saving} className="space-y-4">
           <div className="grid grid-cols-4 gap-2">
             {withPhotos.map((m) => (
-              <button key={m.id} type="button" onClick={() => update({ photoId: m.id, x: 50, y: 50, zoom: 1 })} aria-label={m.title}
-                className={`aspect-square overflow-hidden rounded-md border-2 ${cover?.id === m.id ? "border-primary" : "border-transparent"}`}>
-                <img src={m.url!} alt="" className="h-full w-full object-cover" />
-              </button>
+              <Button key={m.id} variant="outline" type="button" onClick={() => update({ photoId: m.id, x: 50, y: 50, zoom: 1 })} aria-label={m.title} aria-pressed={cover?.id === m.id}
+                className={`h-auto aspect-square overflow-hidden rounded-md border-2 p-0 ${cover?.id === m.id ? "border-primary" : "border-transparent"}`}>
+                <img src={m.url} alt="" className="h-full w-full object-cover" />
+              </Button>
             ))}
           </div>
           {cover?.url && (
@@ -297,9 +294,13 @@ function MagazineCover({ memories, total, onOpen }: { memories: JourneyItem[]; t
             <label className="block space-y-2 text-sm">Dikey konum<Slider value={[settings.y]} min={0} max={100} step={1} onValueChange={([v]) => update({ y: v ?? 50 })} /></label>
             <label className="block space-y-2 text-sm">Yakınlaştırma<Slider value={[settings.zoom]} min={1} max={3} step={0.05} onValueChange={([v]) => update({ zoom: v ?? 1 })} /></label>
           </div>
+          </fieldset>
+          {sharedCover.error && <p role="alert" className="text-sm text-destructive">{sharedCover.error}</p>}
           <div className="flex justify-between">
-            <Button variant="ghost" onClick={() => update({ x: 50, y: 50, zoom: 1 })}>Sıfırla</Button>
-            <Button onClick={() => setEditing(false)}>Tamam</Button>
+            <Button variant="ghost" disabled={sharedCover.saving} onClick={() => update({ x: 50, y: 50, zoom: 1 })}>Sıfırla</Button>
+            <Button disabled={sharedCover.saving} onClick={async () => {
+              if (await sharedCover.save({ ...draft, photoId: cover?.id ?? null })) setEditing(false);
+            }}>{sharedCover.saving ? "Kaydediliyor…" : "İkimiz için kaydet"}</Button>
           </div>
         </DialogContent>
       </Dialog>
