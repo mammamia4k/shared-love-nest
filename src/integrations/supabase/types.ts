@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      magazine_cover: {
+        Row: {
+          id: string
+          photo_id: string | null
+          x: number
+          y: number
+          zoom: number
+        }
+        Insert: {
+          id?: string
+          photo_id?: string | null
+          x?: number
+          y?: number
+          zoom?: number
+        }
+        Update: {
+          id?: string
+          photo_id?: string | null
+          x?: number
+          y?: number
+          zoom?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "magazine_cover_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memories: {
         Row: {
           author_email: string
