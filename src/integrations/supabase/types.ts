@@ -95,6 +95,7 @@ export type Database = {
           done: boolean
           id: string
           plan_date: string | null
+          plan_time: string | null
           title: string
         }
         Insert: {
@@ -103,6 +104,7 @@ export type Database = {
           done?: boolean
           id?: string
           plan_date?: string | null
+          plan_time?: string | null
           title: string
         }
         Update: {
@@ -111,6 +113,7 @@ export type Database = {
           done?: boolean
           id?: string
           plan_date?: string | null
+          plan_time?: string | null
           title?: string
         }
         Relationships: []
